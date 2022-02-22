@@ -141,10 +141,18 @@
     z-index: 10;
     right: 20px;
     width: 30px;
+    cursor: pointer;
     height: 30px;
 }
+.infoWindow__title {
+    position: absolute;
+    color: #fff;
+    top: 20px;
+    left: 20px;
+    max-width: 230px;
+    z-index: 20;
+}
 .infoWindow__inner {
-
     padding: 0 20px 10px 20px;
     color: #005A44;
 }

@@ -14,6 +14,7 @@
         <button class="infoWindow__close" @click="popUp()">
             <div v-html="iconClose"></div>
         </button>
+        <h3 class="infoWindow__title">{{location_selected.longTitle}}</h3>
         <slider v-if="location_selected.images.length" class="infoWindow__slider" ref="slider" :options="options">
             <slideritem v-for="(image,i) in location_selected.images" :key="i">
                 <img :src="image">
@@ -337,13 +338,21 @@ export default {
     z-index: 10;
     right: 20px;
     width: 30px;
+    cursor: pointer;
     height: 30px;
 }
 
-.infoWindow__inner {
+.infoWindow__title {
+    position: absolute;
+    color: #fff;
+    top: 20px;
+    left: 20px;
+    max-width: 230px;
+    z-index: 20;
+}
 
+.infoWindow__inner {
     padding: 0 20px 10px 20px;
     color: #005A44;
-
 }
 </style>
