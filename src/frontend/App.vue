@@ -18,12 +18,16 @@
     <!-- MAP TITLE END -->
 
     <!-- MAP ELEMENTS -->
+
     <template v-for="(cat) in categorys">
-        <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
-            <div class="locations__marker__icon" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
-            <h4 class="locations__marker__title">{{location.title}}</h4>
-        </div>
+        <zoom-center-transition :delay="100">
+            <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
+                <div class="locations__marker__icon" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
+                <h4 class="locations__marker__title">{{location.title}}</h4>
+            </div>
+        </zoom-center-transition>
     </template>
+
     <!-- MAP ELEMENTS END -->
 
     <!--INFO WINDOW -->
@@ -79,7 +83,7 @@
 </template>
 
 <script>
-import { FadeTransition, SlideXLeftTransition, SlideYDownTransition, CollapseTransition, SlideYUpTransition } from 'vue2-transitions'
+import { FadeTransition, SlideXLeftTransition, SlideYDownTransition, CollapseTransition, SlideYUpTransition, ZoomCenterTransition } from 'vue2-transitions'
 import { slider, slideritem } from 'vue-concise-slider'
 export default {
     name: 'App',
@@ -113,7 +117,8 @@ export default {
         FadeTransition,
         SlideYDownTransition,
         SlideYUpTransition,
-        CollapseTransition
+        CollapseTransition,
+        ZoomCenterTransition
     },
     data: function () {
         return {
