@@ -22,11 +22,14 @@
         </slider>
         <div class="infoWindow__inner">
             <span v-for="(tab, key, i) in tabs" :key="i" class="infoWindow__inner__item" @click="selectTab(key)">
+                <div class="infoWindow__inner__item__arrow" v-html="iconVArrow" :style="tab ? 'transform: rotate(180deg)':null"></div>
                 <h3 class="infoWindow__inner__item__title">
                     {{key.replaceAll('_',' ')}}
                 </h3>
                 <div v-if="tab" class="infoWindow__inner__item__content">
-                    {{location_selected.description}}
+                    <p v-html="location_selected.description">
+
+                    </p>
                 </div>
             </span>
         </div>
@@ -65,8 +68,19 @@ export default {
             location ? this.location_selected = location : this.location_selected = []
         },
         selectTab(key) {
+            this.closeAllTabs()
             this.tabs[key] = !this.tabs[key]
+        },
+        closeAllTabs() {
+            Object.keys(this.tabs).forEach(key => {
+                this.tabs[key] = false;
+            });
         }
+    },
+    watch: {
+        location_selected() {
+            this.closeAllTabs()
+        },
     },
     components: {
         slider,
@@ -171,7 +185,7 @@ export default {
 
 .map__footer {
     background-color: #00745F;
-    =width: 100%;
+    width: 100%;
     height: 168px;
     position: absolute;
     bottom: 0;
@@ -286,6 +300,37 @@ export default {
     object-fit: cover;
 }
 
+.infoWindow__inner__item {
+    border-bottom: 3px #FABDB8 solid;
+    display: block;
+    padding: 17px 0 15px 0;
+    cursor: pointer;
+    position: relative;
+}
+
+.infoWindow__inner__item__arrow {
+    position: absolute;
+    top: 18px;
+    right: 0;
+    height: 17px;
+    width: 27px;
+    padding: 0;
+}
+
+.infoWindow__inner__item__content {
+    padding-top: 17px;
+}
+
+.infoWindow__inner__item h3,
+.infoWindow__inner__item p {
+    padding: 0;
+    margin: 0;
+}
+
+.infoWindow__inner__item p {
+    line-height: 1.2;
+}
+
 .infoWindow__close {
     position: absolute;
     top: 20px;
@@ -296,7 +341,9 @@ export default {
 }
 
 .infoWindow__inner {
-    padding: 20px;
+
+    padding: 0 20px 10px 20px;
     color: #005A44;
+
 }
 </style>
