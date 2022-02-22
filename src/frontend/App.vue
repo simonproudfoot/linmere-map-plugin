@@ -1,0 +1,302 @@
+<template>
+<div class="map" id="vue-frontend-app" :style="{'background-image': 'url(' + require('./assets/map-back.jpg') + ')'}">
+    <!-- MAP ELEMENTS -->
+    <template v-for="(cat) in categorys">
+        <div v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
+            <div class="locations__marker__icon" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
+            <h4 class="locations__marker__title">{{location.title}}</h4>
+        </div>
+    </template>
+    <!-- MAP ELEMENTS END -->
+
+    <!--INFO WINDOW -->
+    <div v-if="Object.keys(location_selected).length" class="infoWindow" :style="{left: location_selected.x+'px'}">
+        <button class="infoWindow__close" @click="popUp()">
+            <div v-html="iconClose"></div>
+        </button>
+        <slider v-if="location_selected.images.length" class="infoWindow__slider" ref="slider" :options="options">
+            <slideritem v-for="(image,i) in location_selected.images" :key="i">
+                <img :src="image">
+            </slideritem>
+            <div slot="loading">loading...</div>
+        </slider>
+        <div class="infoWindow__inner">
+            <span v-for="(tab, key, i) in tabs" :key="i" class="infoWindow__inner__item" @click="selectTab(key)">
+                <h3 class="infoWindow__inner__item__title">
+                    {{key.replaceAll('_',' ')}}
+                </h3>
+                <div v-if="tab" class="infoWindow__inner__item__content">
+                    {{location_selected.description}}
+                </div>
+            </span>
+        </div>
+    </div>
+    <!-- INFO WINDOW END -->
+
+    <!-- FOOTER -->
+    <ul class="map__footer">
+        <div v-for="(cat, i) in categorys" :key="i" class="map__footer__item " :class="cat == category_selected ? 'activeIcon' : 'inacitveIcon' " @click="category_selected = cat">
+            <div v-html="cat.icon"></div>
+            <h3 :style="cat == category_selected ? 'opacity: 1' : 'opacity: 0'">{{cat.title.replace('_',' ')}}</h3>
+        </div>
+    </ul>
+    <div class="filterButton">
+        <h3>FILTER</h3>
+        <button>
+            <svg width="67px" height="67px" viewBox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g id="Desktop" stroke="none" stroke-width="1" fill="#fff" fill-rule="evenodd">
+                    <g id="Interactive-map-opened" transform="translate(-50.000000, -963.000000)" fill="#FABDB8">
+                        <rect id="Rectangle" x="50" y="963" width="67" height="67"></rect>
+                    </g>
+                </g>
+            </svg>
+        </button>
+    </div>
+    <!-- FOOTER END -->
+</div>
+</template>
+
+<script>
+import { slider, slideritem } from 'vue-concise-slider'
+export default {
+    name: 'App',
+    methods: {
+        popUp(location) {
+            location ? this.location_selected = location : this.location_selected = []
+        },
+        selectTab(key) {
+            this.tabs[key] = !this.tabs[key]
+        }
+    },
+    components: {
+        slider,
+        slideritem
+    },
+    data: function () {
+        return {
+            location_selected: [],
+            category_selected: '',
+            options: {
+                currentPage: 0
+            },
+            tabs: {
+                description: false,
+                opening_times: false,
+                contact_details: false
+            },
+            tabSelected: null,
+            categorys: [{
+                    title: 'houses',
+                    icon: require('./assets/SVG/houses.svg'),
+                    locations: [{
+                        title: 'gfdg',
+                        longTitle: 'gfdgd',
+                        description: '',
+                        openingTimes: '',
+                        contactDetails: '',
+                        images: [],
+                        x: 0,
+                        y: 0,
+                    }],
+                },
+                {
+                    title: 'schools',
+                    icon: require('./assets/SVG/schools.svg'),
+                    iconColor: '#b77671',
+                    locations: [{
+                        title: 'Tithe farm school',
+                        longTitle: 'Tithe farm recreation school',
+                        description: 'Id nulla adipisicing dolor elit fugiat officia cillum veniam tempor fugiat.',
+                        openingTimes: 'Exercitation reprehenderit sit adipisicing et veniam.',
+                        contactDetails: 'Incididunt id pariatur labore pariatur id irure mollit voluptate aliqua.',
+                        images: ['https://i.cbc.ca/1.5767437.1639580237!/fileImage/httpImage/image.jpg_gen/derivatives/16x9_780/schools-prepare-for-a-january-shutdown.jpg', 'https://www.irishtimes.com/polopoly_fs/1.4073214.1572967755!/image/image.jpg_gen/derivatives/box_620_330/image.jpg'],
+                        x: 517,
+                        y: 712,
+                    }],
+                },
+                {
+                    title: 'parks',
+                    icon: require('./assets/SVG/parks.svg'),
+                },
+                {
+                    title: 'pets',
+                    icon: require('./assets/SVG/pets.svg'),
+                },
+                {
+                    title: 'lidl',
+                    icon: require('./assets/SVG/lidl.svg'),
+                },
+                {
+                    title: 'cafes',
+                    icon: require('./assets/SVG/cafes.svg'),
+                },
+                {
+                    title: 'alotments',
+                    icon: require('./assets/SVG/alotments.svg'),
+                },
+                {
+                    title: 'bikes',
+                    icon: require('./assets/SVG/bikes.svg'),
+                },
+                {
+                    title: 'parking',
+                    icon: require('./assets/SVG/parking.svg'),
+                },
+                {
+                    title: 'bus stops',
+                    icon: require('./assets/SVG/bus_stops.svg'),
+                },
+                {
+                    title: 'station',
+                    icon: require('./assets/SVG/station.svg'),
+                }
+            ],
+            iconClose: require('./assets/SVG/close.svg'),
+            iconVArrow: require('./assets/SVG/v-arrow.svg')
+        }
+    },
+}
+</script>
+
+<style>
+.map {
+    height: 1080px;
+    width: 1920px;
+    border: #000;
+    background-color: #bed8a7;
+    position: relative;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.map__footer {
+    background-color: #00745F;
+    =width: 100%;
+    height: 168px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 0;
+    list-style: none;
+    margin: 0 !important;
+    display: flex;
+    padding-left: 249px;
+}
+
+.map__footer__item {
+    padding-top: 10px;
+    height: auto;
+    text-align: center;
+    color: #fff;
+    padding-top: 2.5em;
+    width: 149px;
+    cursor: pointer;
+    transition-duration: 0.5;
+}
+
+.map__footer__item:hover {
+    transform: scale(1.1);
+}
+
+.map__footer h3 {
+    font-size: 20px !important;
+    margin-top: 5px;
+}
+
+.map__footer__item svg {
+    height: 70px;
+    width: 70px;
+    margin: auto;
+}
+
+.inactiveIcon * {
+    fill: #fff !important;
+    color: #fff !important;
+}
+
+.activeIcon * {
+    fill: #FABDB8 !important;
+    color: #FABDB8 !important;
+}
+
+.filterButton {
+    height: 168px;
+    width: 249px;
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-size: 30px;
+}
+
+.locations {
+    position: relative;
+    border: 2px red dashed;
+    height: 100%;
+    width: 100%;
+}
+
+.locations__marker {
+    position: absolute;
+    max-width: 170px;
+    text-align: center;
+    cursor: pointer;
+    transition-duration: 0.5;
+}
+
+.locations__marker:hover {
+    transform: scale(1.1);
+}
+
+.locations__marker__icon {
+    border-radius: 100px;
+    padding: 8px;
+    margin: auto;
+    height: 48px;
+    width: 48px;
+    border: 1px #fff solid;
+}
+
+.locations__marker__title {
+    color: #2c2e2c;
+    font-size: 26px;
+    margin-top: 13px;
+}
+
+.infoWindow {
+    position: absolute;
+    width: 390px;
+    top: 139px;
+    min-height: 400px;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    transform: translateX(-25%);
+}
+
+.infoWindow__slider {
+    height: 285px;
+    position: relative;
+    background-color: #00745F;
+}
+
+.infoWindow__slider img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.infoWindow__close {
+    position: absolute;
+    top: 20px;
+    z-index: 10;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+}
+
+.infoWindow__inner {
+    padding: 20px;
+    color: #005A44;
+}
+</style>
