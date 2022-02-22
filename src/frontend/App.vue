@@ -37,12 +37,14 @@
                 <div v-html="iconClose"></div>
             </button>
             <h3 class="infoWindow__title">{{location_selected.longTitle}}</h3>
-            <slider v-if="location_selected.images.length" class="infoWindow__slider" ref="slider" :options="options">
+
+            <slider class="infoWindow__slider" ref="slider" :options="options">
                 <slideritem v-for="(image,i) in location_selected.images" :key="i">
-                    <img :src="image">
+                    <img :src="image.sizes.medium">
                 </slideritem>
                 <div slot="loading">loading...</div>
             </slider>
+
             <div class="infoWindow__inner">
                 <span v-for="(tab, key, i) in tabs" :key="i" class="infoWindow__inner__item" @click="selectTab(key)">
                     <div class="infoWindow__inner__item__arrow" v-html="iconVArrow" :style="tab ? 'transform: rotate(180deg)':null"></div>
@@ -85,6 +87,8 @@
 <script>
 import { FadeTransition, SlideXLeftTransition, SlideYDownTransition, CollapseTransition, SlideYUpTransition, ZoomCenterTransition } from 'vue2-transitions'
 import { slider, slideritem } from 'vue-concise-slider'
+import axios from 'axios';
+
 export default {
     name: 'App',
     methods: {
@@ -118,8 +122,24 @@ export default {
         SlideYDownTransition,
         SlideYUpTransition,
         CollapseTransition,
-        ZoomCenterTransition
+        ZoomCenterTransition,
     },
+    created() {
+
+        axios.get("/wp-json/wp/v2/pages")
+            .then(response => {
+                const page = response.data.find(page => page.slug == 'kiosk')
+                // Schools
+                page.acf['schools'].forEach((school) => {
+                    this.categorys.find(x => x.title == 'schools').locations = Object.values(school)
+                })
+
+            })
+            .catch(e => {
+                console.log(e)
+            })
+    },
+
     data: function () {
         return {
             showFooter: false,
@@ -138,31 +158,35 @@ export default {
                     title: 'houses',
                     iconColor: '#000',
                     icon: require('./assets/SVG/houses.svg'),
-                    locations: [{
-                        title: 'gfdg',
-                        longTitle: 'gfdgd',
-                        description: '',
-                        openingTimes: '',
-                        contactDetails: '',
-                        images: [],
-                        x: 700,
-                        y: 200,
-                    }],
+                    locations: [
+                        //     {
+                        //     title: 'gfdg',
+                        //     longTitle: 'gfdgd',
+                        //     description: '',
+                        //     openingTimes: '',
+                        //     contactDetails: '',
+                        //     images: [],
+                        //     x: 700,
+                        //     y: 200,
+                        // }
+                    ],
                 },
                 {
                     title: 'schools',
                     icon: require('./assets/SVG/schools.svg'),
                     iconColor: '#b77671',
-                    locations: [{
-                        title: 'Tithe farm school',
-                        longTitle: 'Tithe farm recreation school',
-                        description: 'Id nulla adipisicing dolor elit fugiat officia cillum veniam tempor fugiat.',
-                        openingTimes: 'Exercitation reprehenderit sit adipisicing et veniam.',
-                        contactDetails: 'Incididunt id pariatur labore pariatur id irure mollit voluptate aliqua.',
-                        images: ['https://i.cbc.ca/1.5767437.1639580237!/fileImage/httpImage/image.jpg_gen/derivatives/16x9_780/schools-prepare-for-a-january-shutdown.jpg', 'https://www.irishtimes.com/polopoly_fs/1.4073214.1572967755!/image/image.jpg_gen/derivatives/box_620_330/image.jpg'],
-                        x: 517,
-                        y: 712,
-                    }],
+                    locations: [
+                        //     {
+                        //     title: 'Tithe farm school',
+                        //     longTitle: 'Tithe farm recreation school',
+                        //     description: 'Id nulla adipisicing dolor elit fugiat officia cillum veniam tempor fugiat.',
+                        //     openingTimes: 'Exercitation reprehenderit sit adipisicing et veniam.',
+                        //     contactDetails: 'Incididunt id pariatur labore pariatur id irure mollit voluptate aliqua.',
+                        //     images: ['https://i.cbc.ca/1.5767437.1639580237!/fileImage/httpImage/image.jpg_gen/derivatives/16x9_780/schools-prepare-for-a-january-shutdown.jpg', 'https://www.irishtimes.com/polopoly_fs/1.4073214.1572967755!/image/image.jpg_gen/derivatives/box_620_330/image.jpg'],
+                        //     x: 517,
+                        //     y: 712,
+                        // }
+                    ],
                 },
                 {
                     title: 'parks',

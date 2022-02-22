@@ -11,9 +11,11 @@
     "build": "webpack -p --mode production"
   },
   "dependencies": {
+    "axios": "^0.26.0",
     "gsap": "^3.9.1",
     "svg-url-loader": "^7.1.1",
     "vue": "^2.6.11",
+    "vue-axios": "^3.4.1",
     "vue-router": "^3.4.3",
     "vue2-transitions": "^0.3.0"
   },
