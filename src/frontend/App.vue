@@ -15,14 +15,16 @@
     </div>
     <!-- MAP TITLE END -->
     <!-- MAP ELEMENTS -->
-    <template v-for="(cat) in categorys">
+    <transitionGroup name="bounce" mode="inOut">
+        <template v-for="(cat) in categorys">
 
-        <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
-            <div class="locations__marker__icon" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
-            <h4 class="locations__marker__title">{{location.title}}</h4>
-        </div>
+            <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
+                <div class="locations__marker__icon" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
+                <h4 class="locations__marker__title">{{location.title}}</h4>
+            </div>
 
-    </template>
+        </template>
+    </transitionGroup>
     <!-- MAP ELEMENTS END -->
     <!--INFO WINDOW -->
     <fade-transition>
@@ -134,7 +136,6 @@ export default {
         // pets
         if (data['pets'])
             data['pets'].forEach((pet) => {
-
                 this.categorys.find(x => x.title == 'pets').locations.push(pet.pet)
             })
         // lidl
@@ -191,67 +192,78 @@ export default {
             categorys: [{
                     title: 'houses',
                     iconColor: '#000',
+                    iconsSize: '38px',
                     icon: require('./assets/SVG/houses.svg'),
                     locations: [],
                 },
                 {
                     title: 'schools',
+                    iconsSize: '38px',
                     icon: require('./assets/SVG/schools.svg'),
-                    iconColor: '#b77671',
+                    iconColor: '#B77671',
                     locations: [],
                 },
                 {
                     title: 'parks',
                     icon: require('./assets/SVG/parks.svg'),
-                    iconColor: '#b77671',
+                    iconColor: '#FAC000',
+                    iconsSize: '27px',
                     locations: [],
                 },
                 {
                     title: 'pets',
                     icon: require('./assets/SVG/pets.svg'),
                     iconColor: '#b77671',
+                    iconsSize: '38px',
                     locations: [],
                 },
                 {
                     title: 'lidl',
                     icon: require('./assets/SVG/lidl.svg'),
                     iconColor: '#b77671',
+                    iconsSize: '38px',
                     locations: [],
                 },
                 {
                     title: 'cafes',
                     icon: require('./assets/SVG/cafes.svg'),
                     iconColor: '#b77671',
+                    iconsSize: '38px',
                     locations: [],
                 },
                 {
                     title: 'allotments',
                     icon: require('./assets/SVG/allotments.svg'),
                     iconColor: '#b77671',
+                    iconsSize: '38px',
                     locations: [],
                 },
                 {
                     title: 'bikes',
                     icon: require('./assets/SVG/bikes.svg'),
                     iconColor: '#b77671',
+                    iconsSize: '38px',
                     locations: [],
                 },
                 {
                     title: 'parking',
                     icon: require('./assets/SVG/parking.svg'),
                     iconColor: '#b77671',
+                    iconsSize: '38px',
                     locations: [],
                 },
                 {
                     title: 'bus stops',
                     icon: require('./assets/SVG/bus_stops.svg'),
-                    iconColor: '#b77671',
+                    iconColor: '#000',
+                    iconsSize: '38px',
                     locations: [],
                 },
                 {
                     title: 'station',
                     icon: require('./assets/SVG/station.svg'),
-                    iconColor: '#b77671',
+                    iconColor: '#000',
+                    iconsSize: '38px',
                     locations: [],
                 }
             ],
@@ -508,4 +520,29 @@ button {
 .map__title h1 {
     margin-bottom: 0;
 }
+
+.v-enter-active,
+.v-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.bounce-enter-active {
+  animation: bounce-in 0.5s;
+}
+.bounce-leave-active {
+  animation: bounce-in 0.5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+
 </style>
