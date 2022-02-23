@@ -20,7 +20,7 @@ Domain Path: /languages
 add_filter('page_template', 'fw_reserve_page_template');
 function fw_reserve_page_template($page_template)
 {
-    if (is_page('kiosk-8')) {
+    if (is_page('kiosk')) {
 
         $page_template = dirname(__FILE__) . '/views/page-kiosk.php';
     }
