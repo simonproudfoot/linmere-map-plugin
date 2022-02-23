@@ -107,11 +107,23 @@ button {
 }
 .locations__marker__icon {
     border-radius: 100px;
+    position: relative;
     padding: 8px;
     margin: auto;
     height: 48px;
     width: 48px;
     border: 1px #fff solid;
+}
+.locations__marker__icon svg {
+
+    position: absolute;
+    width: 30px;
+    object-fit: contain;
+    left: 0;
+    right: 0;
+    margin: auto;
+    top: 0;
+    bottom: 0;
 }
 .locations__marker__title {
     color: #2c2e2c;

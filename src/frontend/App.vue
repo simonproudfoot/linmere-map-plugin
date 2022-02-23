@@ -1,6 +1,5 @@
 <template>
 <div class="map" id="vue-frontend-app" :style="{'background-image': 'url(' + require('./assets/map-back.jpg') + ')'}">
-
     <!-- MAP TITLE -->
     <div class="map__title text-green">
         <div style="width: 124px; height:118px" :class="showFooter ? 'fillPink' : 'fillGreen'">
@@ -13,23 +12,18 @@
                 <h1>LINMERE</h1>
             </span>
         </fade-transition>
-
     </div>
     <!-- MAP TITLE END -->
-
     <!-- MAP ELEMENTS -->
-
     <template v-for="(cat) in categorys">
-        <zoom-center-transition :delay="100">
-            <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
-                <div class="locations__marker__icon" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
-                <h4 class="locations__marker__title">{{location.title}}</h4>
-            </div>
-        </zoom-center-transition>
+
+        <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
+            <div class="locations__marker__icon" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
+            <h4 class="locations__marker__title">{{location.title}}</h4>
+        </div>
+
     </template>
-
     <!-- MAP ELEMENTS END -->
-
     <!--INFO WINDOW -->
     <fade-transition>
         <div v-if="Object.keys(location_selected).length" class="infoWindow" :style="{left: location_selected.x+'px'}">
@@ -37,14 +31,12 @@
                 <div v-html="iconClose"></div>
             </button>
             <h3 class="infoWindow__title">{{location_selected.longTitle}}</h3>
-
             <slider class="infoWindow__slider" ref="slider" :options="options">
                 <slideritem v-for="(image,i) in location_selected.images" :key="i">
                     <img :src="image.sizes.medium">
                 </slideritem>
                 <div slot="loading">loading...</div>
             </slider>
-
             <div class="infoWindow__inner">
                 <span v-for="(tab, key, i) in tabs" :key="i" class="infoWindow__inner__item" @click="selectTab(key)">
                     <div class="infoWindow__inner__item__arrow" v-html="iconVArrow" :style="tab ? 'transform: rotate(180deg)':null"></div>
@@ -62,7 +54,6 @@
         </div>
     </fade-transition>
     <!-- INFO WINDOW END -->
-
     <!-- FOOTER -->
     <slide-y-down-transition>
         <div v-show="showFooter" class="map__footer">
@@ -74,9 +65,7 @@
     </slide-y-down-transition>
     <slide-x-left-transition>
         <div class="filterButton" @click="showFooter = !showFooter">
-
             <h3 class="text-green" v-show="!showFooter">FILTER</h3>
-
             <button v-html="iconVArrow" :class="showFooter ? 'bg-pink' :'bg-green'" style="padding: 18px" class="btn-sq inactiveIcon" :style="!showFooter ? 'transform: rotate(270deg)' : 'transform: rotate(90deg)'"></button>
         </div>
     </slide-x-left-transition>
@@ -88,7 +77,6 @@
 import { FadeTransition, SlideXLeftTransition, SlideYDownTransition, CollapseTransition, SlideYUpTransition, ZoomCenterTransition } from 'vue2-transitions'
 import { slider, slideritem } from 'vue-concise-slider'
 import axios from 'axios';
-
 export default {
     name: 'App',
     methods: {
@@ -124,22 +112,68 @@ export default {
         CollapseTransition,
         ZoomCenterTransition,
     },
-    created() {
-
-        axios.get("/wp-json/wp/v2/pages")
-            .then(response => {
-                const page = response.data.find(page => page.slug == 'kiosk')
-                // Schools
-                page.acf['schools'].forEach((school) => {
-                    this.categorys.find(x => x.title == 'schools').locations = Object.values(school)
-                })
-
+    async created() {
+        let page = await axios.get("/wp-json/wp/v2/pages")
+        let data = await page.data.find(page => page.slug == 'kiosk').acf
+        // houses
+        if (data['houses'])
+            data['houses'].forEach((house) => {
+                this.categorys.find(x => x.title == 'houses').locations.push(house.house)
             })
-            .catch(e => {
-                console.log(e)
+        // schools
+        if (data['schools'])
+            data['schools'].forEach((school) => {
+
+                this.categorys.find(x => x.title == 'schools').locations.push(school.school)
             })
+        // Parks
+        if (data['parks'])
+            data['parks'].forEach((park) => {
+                this.categorys.find(x => x.title == 'parks').locations.push(park.park)
+            })
+        // pets
+        if (data['pets'])
+            data['pets'].forEach((pet) => {
+
+                this.categorys.find(x => x.title == 'pets').locations.push(pet.pet)
+            })
+        // lidl
+        if (data['lidl'])
+            data['lidl'].forEach((lidl) => {
+                this.categorys.find(x => x.title == 'lidl').locations.push(lidl.lidl)
+            })
+        // cafes
+        if (data['cafes'])
+            data['cafes'].forEach((cafe) => {
+                this.categorys.find(x => x.title == 'cafes').locations.push(cafe.cafe)
+            })
+        // allotments
+        if (data['allotments'])
+            data['allotments'].forEach((allotment) => {
+                this.categorys.find(x => x.title == 'allotments').locations.push(allotment.allotment)
+            })
+        // bikes
+        if (data['bikes'])
+            data['bikes'].forEach((bike) => {
+                this.categorys.find(x => x.title == 'bikes').locations.push(bike.bike)
+            })
+        // parking
+        if (data['parking'])
+            data['parking'].forEach((parking) => {
+                this.categorys.find(x => x.title == 'parking').locations.push(parking.parking)
+            })
+        // bus stops
+        if (data['bus_stops'])
+            data['bus_stops'].forEach((bus_stop) => {
+                this.categorys.find(x => x.title == 'bus_stops').locations.push(bus_stop.bus_stop)
+            })
+        // station
+        if (data['station'])
+            data['station'].forEach((station) => {
+                this.categorys.find(x => x.title == 'station').locations.push(station.station)
+            })
+
     },
-
     data: function () {
         return {
             showFooter: false,
@@ -158,71 +192,67 @@ export default {
                     title: 'houses',
                     iconColor: '#000',
                     icon: require('./assets/SVG/houses.svg'),
-                    locations: [
-                        //     {
-                        //     title: 'gfdg',
-                        //     longTitle: 'gfdgd',
-                        //     description: '',
-                        //     openingTimes: '',
-                        //     contactDetails: '',
-                        //     images: [],
-                        //     x: 700,
-                        //     y: 200,
-                        // }
-                    ],
+                    locations: [],
                 },
                 {
                     title: 'schools',
                     icon: require('./assets/SVG/schools.svg'),
                     iconColor: '#b77671',
-                    locations: [
-                        //     {
-                        //     title: 'Tithe farm school',
-                        //     longTitle: 'Tithe farm recreation school',
-                        //     description: 'Id nulla adipisicing dolor elit fugiat officia cillum veniam tempor fugiat.',
-                        //     openingTimes: 'Exercitation reprehenderit sit adipisicing et veniam.',
-                        //     contactDetails: 'Incididunt id pariatur labore pariatur id irure mollit voluptate aliqua.',
-                        //     images: ['https://i.cbc.ca/1.5767437.1639580237!/fileImage/httpImage/image.jpg_gen/derivatives/16x9_780/schools-prepare-for-a-january-shutdown.jpg', 'https://www.irishtimes.com/polopoly_fs/1.4073214.1572967755!/image/image.jpg_gen/derivatives/box_620_330/image.jpg'],
-                        //     x: 517,
-                        //     y: 712,
-                        // }
-                    ],
+                    locations: [],
                 },
                 {
                     title: 'parks',
                     icon: require('./assets/SVG/parks.svg'),
+                    iconColor: '#b77671',
+                    locations: [],
                 },
                 {
                     title: 'pets',
                     icon: require('./assets/SVG/pets.svg'),
+                    iconColor: '#b77671',
+                    locations: [],
                 },
                 {
                     title: 'lidl',
                     icon: require('./assets/SVG/lidl.svg'),
+                    iconColor: '#b77671',
+                    locations: [],
                 },
                 {
                     title: 'cafes',
                     icon: require('./assets/SVG/cafes.svg'),
+                    iconColor: '#b77671',
+                    locations: [],
                 },
                 {
-                    title: 'alotments',
-                    icon: require('./assets/SVG/alotments.svg'),
+                    title: 'allotments',
+                    icon: require('./assets/SVG/allotments.svg'),
+                    iconColor: '#b77671',
+                    locations: [],
                 },
                 {
                     title: 'bikes',
                     icon: require('./assets/SVG/bikes.svg'),
+                    iconColor: '#b77671',
+                    locations: [],
                 },
                 {
                     title: 'parking',
                     icon: require('./assets/SVG/parking.svg'),
+                    iconColor: '#b77671',
+                    locations: [],
                 },
                 {
                     title: 'bus stops',
                     icon: require('./assets/SVG/bus_stops.svg'),
+                    iconColor: '#b77671',
+                    locations: [],
                 },
                 {
                     title: 'station',
                     icon: require('./assets/SVG/station.svg'),
+                    iconColor: '#b77671',
+                    locations: [],
                 }
             ],
             iconClose: require('./assets/SVG/close.svg'),
@@ -340,7 +370,6 @@ button {
     margin: 0;
     padding-bottom: 0;
     padding-right: 30px;
-
 }
 
 .locations {
@@ -355,6 +384,7 @@ button {
     text-align: center;
     cursor: pointer;
     transition-duration: 0.5;
+
 }
 
 .locations__marker:hover {
@@ -363,11 +393,25 @@ button {
 
 .locations__marker__icon {
     border-radius: 100px;
+    position: relative;
     padding: 8px;
     margin: auto;
     height: 48px;
     width: 48px;
     border: 1px #fff solid;
+}
+
+.locations__marker__icon svg {
+
+    position: absolute;
+    width: 30px;
+    object-fit: contain;
+    left: 0;
+    right: 0;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+
 }
 
 .locations__marker__title {

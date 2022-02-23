@@ -335,9 +335,9 @@ final class Base_Plugin
     public function init_classes()
     {
 
-        if ($this->is_request('admin')) {
-            $this->container['admin'] = new App\Admin();
-        }
+        // if ($this->is_request('admin')) {
+        //     $this->container['admin'] = new App\Admin();
+        // }
 
         if ($this->is_request('frontend')) {
             $this->container['frontend'] = new App\Frontend();
