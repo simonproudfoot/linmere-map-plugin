@@ -16,23 +16,22 @@ Domain Path: /languages
  */
 
 // don't call the file directly
+
+add_filter('page_template', 'fw_reserve_page_template');
+function fw_reserve_page_template($page_template)
+{
+    if (is_page('kiosk-8')) {
+
+        $page_template = dirname(__FILE__) . '/views/page-kiosk.php';
+    }
+    return $page_template;
+}
+
+
+
 if (!defined('ABSPATH')) exit;
 
 
-
-
-// if( function_exists('acf_add_options_page') ) {
-
-// 	acf_add_options_page(array(
-// 		'page_title' 	=> 'Map content',
-// 		'menu_title'	=> 'Map content',
-// 		'menu_slug' 	=> 'map-content',
-//         'post_id' => 'map-content',
-// 		'capability'	=> 'edit_posts',
-// 		'redirect'		=> false
-// 	));
-
-// }
 
 
 function acf_to_rest_api($response, $post, $request)
@@ -92,90 +91,16 @@ final class Base_Plugin
         $found_post_title = get_page_by_title($post_title, OBJECT, $post_type);
         $found_post_id = $found_post_title->ID;
 
-        /**********************************************************
-         ** Check If Page does not exist, if true, create a new post 
-         ************************************************************/
-        if (FALSE === get_post_status($found_post_id)) :
+        $page = get_page_by_path($post_title);
 
-            $post_args = array(
-                'post_title' => $post_title,
-                'post_type' => $post_type,
-                'post_content' => $post_content,
-                'post_status'  => $post_status,
-                //'post_author'  => get_current_user_id(),
-
-                /* If you have meta fields to enter data into */
-                'meta_input'   => array(
-                    'meta_key1' => 'my value',
-                    'meta_key2' => 'my other value',
-                ),
-            );
-
-
-            /* Add a new wp post into db, return it's post id */
-            $returned_post_id = wp_insert_post($post_args);
-
-            /* Update page template only if using "page" as the post_type */
-            update_post_meta($returned_post_id, '_wp_page_template', 'my-page-template.php');
-
-            /* Add values into meta fields. Work with ACF CUSTOM FIELDS!! */
-            $field_key = "My_Field_KEY";
-            $value = "my custom value";
-            update_field($field_key, $value, $returned_post_id);
-
-            $field_key = "My_Other_Field_KEY";
-            $value = "my other custom value";
-            update_field($field_key, $value, $returned_post_id);
-
-            /* Save a checkbox or select value */
-            // $field_key = "My_Field_KEY";
-            // $value = array("red", "blue", "yellow");
-            // update_field( $field_key, $value, $returned_post_id );
-
-            /* Save to a repeater field value */
-            // $field_key = "My_Field_KEY";
-            // $value = array(
-            //   array(
-            //     "ss_name" => "Foo",
-            //     "ss_type" => "Bar"
-            //   )
-            // );
-            // update_field( $field_key, $value, $returned_post_id );
-
-            /* Echo a response! */
-            echo "<span class='pg-new'><strong>" . $post_title . " Created!</strong></span><br>";
-            echo "<a href='" . esc_url(get_permalink($returned_post_id)) . "' target='_Blank'>" . $post_title . "</a><p>";
-
-
-        else :
-            /***************************
-             ** IF POST EXISTS, update it 
-             ****************************/
-
-            /* Update post */
-            $update_post_args = array(
-                'ID'           => $found_post_id,
-                'post_title'   => $post_title,
-                'post_content' => $post_content,
-            );
-
-            /* Update the post into the database */
-            wp_update_post($update_post_args);
-
-            /* Update values into meta fields */
-            $field_key = "My_Field_KEY";
-            $value = "my custom value";
-            update_field($field_key, $value, $found_post_id);
-
-            $field_key = "My_Other_Field_KEY";
-            $value = "my other custom value";
-            update_field($field_key, $value, $found_post_id);
-
-            /* Echo a response! */
-            echo "<span class='pg-update'><strong>" . $post_title . " Updated!</strong></span><br>";
-            echo "<a href='" . esc_url(get_permalink($found_post_id)) . "' target='_Blank'>View</a> | <a href='post.php?post=" . $found_post_id . "&action=edit'>" . $post_title . "</a><p>";
-
-        endif;
+        $post_args = array(
+            'post_title' => $post_title,
+            'post_type' => $post_type,
+            'post_content' => $post_content,
+            'post_status'  => $post_status,
+            'post_author'  => get_current_user_id(),
+        );
+        wp_insert_post($post_args);
     }
 
 
