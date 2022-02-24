@@ -33,12 +33,20 @@
                 <div v-html="iconClose"></div>
             </button>
             <h3 class="infoWindow__title">{{location_selected.longTitle}}</h3>
-            <slider class="infoWindow__slider" ref="slider" :options="options">
-                <slideritem v-for="(image,i) in location_selected.images" :key="i">
-                    <img :src="image.sizes.large">
-                </slideritem>
-                <div slot="loading">loading...</div>
-            </slider>
+
+            <div style="position: relative">
+                <span v-html="iconVArrow" class="arrows left" @click="() => {this.$refs['slider'] && this.$refs['slider'].$emit('slidePre')}"></span>
+                <span v-html="iconVArrow" class="arrows right" @click="() => {this.$refs['slider'] && this.$refs['slider'].$emit('slideNext')}"></span>
+                <slider class="infoWindow__slider" ref="slider" :options="options">
+
+                    <slideritem v-for="(image,i) in location_selected.images" :key="i">
+                        <img :src="image.sizes.large">
+                    </slideritem>
+                    <div slot="loading">loading...</div>
+
+                </slider>
+            </div>
+
             <div class="infoWindow__inner">
                 <span v-for="(tab, key, i) in tabs" :key="i" class="infoWindow__inner__item" @click="selectTab(key)">
                     <div class="infoWindow__inner__item__arrow" v-html="iconVArrow" :style="tab ? 'transform: rotate(180deg)':null"></div>
@@ -451,13 +459,53 @@ button {
 .infoWindow__slider {
     height: 285px;
     position: relative;
-    background-color: #00745F;
+    background-color: #000;
+}
+
+.arrows {
+    position: absolute;
+    top: 50%;
+    width: 22px;
+    height: 7px;
+    z-index: 10;
+    cursor: pointer;
+
+}
+
+.swiper-container-horizontal>*>.slider-pagination-bullet {
+    background: none ;
+    border-radius: 100%;
+    display: inline-block;
+    height: 11px !important;
+    opacity: 1 !important;
+    width: 11px !important;
+    cursor: pointer;
+    margin: 0 5px;
+}
+
+.slider-pagination-bullet-active{
+    background-color: #fff !important;
+}
+
+.arrows * {
+    fill: #fff;
+}
+
+.arrows.left {
+    left: 20px;
+    transform: rotate(90deg);
+}
+
+.arrows.right {
+    right: 20px;
+    transform: rotate(-90deg);
 }
 
 .infoWindow__slider img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    opacity: 0.8;
 }
 
 .infoWindow__inner__item {
@@ -497,9 +545,15 @@ button {
     top: 20px;
     z-index: 10;
     right: 20px;
-    width: 30px;
+    width: 20px;
     cursor: pointer;
-    height: 30px;
+    height: 20px;
+}
+
+.slider-pagination-bullet {
+    background: transparent;
+    border: 3px solid #fff;
+
 }
 
 .infoWindow__title {
