@@ -278,6 +278,10 @@ export default {
 </script>
 
 <style>
+
+#cookie-law-info-again{
+    display: none !important;
+}
 .bg-green {
     background-color: #00745F;
 }
