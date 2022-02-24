@@ -5,6 +5,11 @@
   "author": "Tareq Hasan <tareq@wedevs.com>",
   "license": "GPLv2",
   "private": true,
+  "browserslist": [
+    ">1%",
+    "last 4 versions",
+    "not ie < 9"
+  ],
   "scripts": {
     "dev": "webpack --watch --progress --hide-modules",
     "dev-build": "webpack -d --mode development",
@@ -22,6 +27,7 @@
   "devDependencies": {
     "@babel/core": "^7.11.1",
     "@babel/preset-env": "latest",
+    "autoprefixer": "^10.4.2",
     "babel-loader": "^8.1.0",
     "browser-sync": "^2.26.12",
     "browser-sync-webpack-plugin": "^2.2.2",
@@ -34,6 +40,7 @@
     "less-loader": "^5.0.0",
     "mini-css-extract-plugin": "^0.8.2",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "postcss-loader": "^6.2.1",
     "raw-loader": "^4.0.2",
     "svg-inline-loader": "^0.8.2",
     "terser-webpack-plugin": "^4.1.0",

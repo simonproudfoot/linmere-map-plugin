@@ -331,7 +331,7 @@ export default {
     padding-top: 2.5em;
     width: 149px;
     cursor: pointer;
-    transition-duration: 0.5;
+    transition-duration: 0.2s;
 }
 
 .map__footer__item:hover {
@@ -401,11 +401,12 @@ button {
     max-width: 170px;
     text-align: center;
     cursor: pointer;
-    transition-duration: 0.5;
+
 
 }
 
 .locations__marker:hover {
+        transition-duration: 0.2s;
     transform: scale(1.1);
 }
 
@@ -542,15 +543,18 @@ button {
 
 @keyframes bounce-in {
     0% {
-        transform: scale(0);
+        transform: scale(0.8);
+        opacity: 0;
     }
 
     50% {
         transform: scale(1.25);
+        opacity: 0.5;
     }
 
     100% {
         transform: scale(1);
+        opacity: 1;
     }
 }
 </style>
