@@ -35,7 +35,7 @@
             <h3 class="infoWindow__title">{{location_selected.longTitle}}</h3>
             <slider class="infoWindow__slider" ref="slider" :options="options">
                 <slideritem v-for="(image,i) in location_selected.images" :key="i">
-                    <img :src="image.sizes.medium">
+                    <img :src="image.sizes.large">
                 </slideritem>
                 <div slot="loading">loading...</div>
             </slider>
@@ -47,6 +47,7 @@
                     </h3>
                     <collapse-transition>
                         <div v-if="tab" class="infoWindow__inner__item__content">
+                            <div style="height: 17px; width: 100%; display: block"></div>
                             <p v-html="location_selected.description">
                             </p>
                         </div>
@@ -115,7 +116,8 @@ export default {
         ZoomCenterTransition,
     },
     async created() {
-        let page = await axios.get("/wp-json/wp/v2/pages")
+        //  let page = await axios.get("/wp-json/wp/v2/pages")
+        let page = await axios.get("https://linmere.greenwich-design-projects.co.uk/wp-json/wp/v2/pages")
         let data = await page.data.find(page => page.slug == 'kiosk').acf
         // houses
         if (data['houses'])
@@ -473,7 +475,7 @@ button {
 }
 
 .infoWindow__inner__item__content {
-    padding-top: 17px;
+    /* padding-top: 17px; */
     display: block;
 }
 
@@ -527,22 +529,24 @@ button {
 }
 
 .bounce-enter-active {
-  animation: bounce-in 0.5s;
+    animation: bounce-in 0.5s;
 }
+
 .bounce-leave-active {
-  animation: bounce-in 0.5s reverse;
+    animation: bounce-in 0.5s reverse;
 }
+
 @keyframes bounce-in {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.25);
-  }
-  100% {
-    transform: scale(1);
-  }
+    0% {
+        transform: scale(0);
+    }
+
+    50% {
+        transform: scale(1.25);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
-
-
 </style>
