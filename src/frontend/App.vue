@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { FadeTransition, SlideXLeftTransition, SlideYDownTransition, CollapseTransition, SlideYUpTransition, ZoomCenterTransition } from 'vue2-transitions'
+import { FadeTransition, SlideXLeftTransition, SlideYDownTransition, CollapseTransition, SlideYUpTransition } from 'vue2-transitions'
 import { slider, slideritem } from 'vue-concise-slider'
 import axios from 'axios';
 export default {
@@ -113,10 +113,9 @@ export default {
         SlideYDownTransition,
         SlideYUpTransition,
         CollapseTransition,
-        ZoomCenterTransition,
     },
     async created() {
-        //  let page = await axios.get("/wp-json/wp/v2/pages")
+        //    let page = await axios.get("/wp-json/wp/v2/pages")
         let page = await axios.get("https://linmere.greenwich-design-projects.co.uk/wp-json/wp/v2/pages")
         let data = await page.data.find(page => page.slug == 'kiosk').acf
         // houses
@@ -278,10 +277,10 @@ export default {
 </script>
 
 <style>
-
-#cookie-law-info-again{
+#cookie-law-info-again {
     display: none !important;
 }
+
 .bg-green {
     background-color: #00745F;
 }
@@ -402,11 +401,10 @@ button {
     text-align: center;
     cursor: pointer;
 
-
 }
 
 .locations__marker:hover {
-        transition-duration: 0.2s;
+    transition-duration: 0.2s;
     transform: scale(1.1);
 }
 
