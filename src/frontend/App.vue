@@ -1,9 +1,16 @@
 <template>
-<div class="map" id="vue-frontend-app" :style="{'background-image': 'url(' + require('./assets/map-back.jpg') + ')'}">
+<div class="map" id="vue-frontend-app">
+
+    <!-- zoom buttons -->
+    <div class="zoomer">
+        <button @click="zoomInOut('+')">+</button>
+        <button @click="zoomInOut('-')">-</button>
+    </div>
+
     <!-- MAP TITLE -->
-    <div class="map__title text-green">
-        <div style="width: 124px; height:118px" :class="showFooter ? 'fillPink' : 'fillGreen'">
-            <span v-html="iconLeaf"></span>
+    <div class="map__title text-green" :style="{'transform': 'scale('+counterZoom+')'}">
+        <div style="width: 124px; height:118px">
+            <span :class="showFooter ? 'bigLeafActive' : null" v-html="iconLeaf"></span>
         </div>
         <fade-transition>
             <span v-show="!showFooter">
@@ -14,17 +21,22 @@
         </fade-transition>
     </div>
     <!-- MAP TITLE END -->
-    <!-- MAP ELEMENTS -->
-    <transitionGroup name="bounce" mode="inOut">
-        <template v-for="(cat) in categorys">
 
-            <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
-                <div class="locations__marker__icon" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
-                <h4 class="locations__marker__title">{{location.title}}</h4>
-            </div>
+    <!-- WRAP ALL ZOOM ELEMENTS IN HERE -->
+    <panZoom :options="{minZoom: 1, maxZoom: 5,initialZoom: 1, bounds: true, initialY: 550, initialX: 960, boundsPadding: 1,   boundsDisabledForZoom: true,  zoomSpeed: 0.065}">
+        <div class="mapBackground" :style="[{'background-image': 'url(' + require('./assets/map-back.jpg') + ')'}]">
 
-        </template>
-    </transitionGroup>
+            <transitionGroup name="bounce" mode="inOut">
+                <template v-for="(cat) in categorys">
+                    <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
+                        <div class="locations__marker__icon" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
+                        <h4 class="locations__marker__title">{{location.title}}</h4>
+                    </div>
+                </template>
+            </transitionGroup>
+        </div>
+    </panZoom>
+
     <!-- MAP ELEMENTS END -->
     <!--INFO WINDOW -->
     <fade-transition>
@@ -33,20 +45,16 @@
                 <div v-html="iconClose"></div>
             </button>
             <h3 class="infoWindow__title">{{location_selected.longTitle}}</h3>
-
             <div style="position: relative">
                 <span v-html="iconVArrow" class="arrows left" @click="() => {this.$refs['slider'] && this.$refs['slider'].$emit('slidePre')}"></span>
                 <span v-html="iconVArrow" class="arrows right" @click="() => {this.$refs['slider'] && this.$refs['slider'].$emit('slideNext')}"></span>
                 <slider class="infoWindow__slider" ref="slider" :options="options">
-
                     <slideritem v-for="(image,i) in location_selected.images" :key="i">
                         <img :src="image.sizes.large">
                     </slideritem>
                     <div slot="loading">loading...</div>
-
                 </slider>
             </div>
-
             <div class="infoWindow__inner">
                 <span v-for="(tab, key, i) in tabs" :key="i" class="infoWindow__inner__item" @click="selectTab(key)">
                     <div class="infoWindow__inner__item__arrow" v-html="iconVArrow" :style="tab ? 'transform: rotate(180deg)':null"></div>
@@ -88,9 +96,24 @@
 import { FadeTransition, SlideXLeftTransition, SlideYDownTransition, CollapseTransition, SlideYUpTransition } from 'vue2-transitions'
 import { slider, slideritem } from 'vue-concise-slider'
 import axios from 'axios';
+// import vue-panzoom
+// import vue-panzoom
+import panZoom from 'vue-panzoom'
+import Vue from 'vue'
+// install plugin
+Vue.use(panZoom);
+
 export default {
     name: 'App',
     methods: {
+        zoomInOut(inOut) {
+            if (inOut == '+') {
+                this.zoom += 0.2
+            } else {
+                this.zoom -= 0.2
+
+            }
+        },
         popUp(location) {
             location ? this.location_selected = location : this.location_selected = []
         },
@@ -104,6 +127,7 @@ export default {
             });
         }
     },
+
     watch: {
         showFooter() {
             this.location_selected = []
@@ -120,7 +144,7 @@ export default {
         FadeTransition,
         SlideYDownTransition,
         SlideYUpTransition,
-        CollapseTransition,
+        CollapseTransition
     },
     async created() {
         //    let page = await axios.get("/wp-json/wp/v2/pages")
@@ -134,7 +158,6 @@ export default {
         // schools
         if (data['schools'])
             data['schools'].forEach((school) => {
-
                 this.categorys.find(x => x.title == 'schools').locations.push(school.school)
             })
         // Parks
@@ -182,10 +205,11 @@ export default {
             data['station'].forEach((station) => {
                 this.categorys.find(x => x.title == 'station').locations.push(station.station)
             })
-
     },
     data: function () {
         return {
+            zoom: 1,
+            counterZoom: 1,
             showFooter: false,
             location_selected: [],
             category_selected: '',
@@ -285,7 +309,10 @@ export default {
 </script>
 
 <style>
-#cookie-law-info-again {
+.rc-anchor-content,
+#cookie-law-info-again,
+#rc-anchor-container,
+#cookie-law-info-bar {
     display: none !important;
 }
 
@@ -310,10 +337,18 @@ export default {
     height: 1080px;
     width: 1920px;
     border: #000;
-    background-color: #bed8a7;
+    background-color: #e6efdc;
     position: relative;
+    overflow: hidden;
+
+}
+
+.mapBackground {
+    height: 1080px;
+    width: 1920px;
     background-size: cover;
     background-repeat: no-repeat;
+
 }
 
 .map__footer {
@@ -408,7 +443,6 @@ button {
     max-width: 170px;
     text-align: center;
     cursor: pointer;
-
 }
 
 .locations__marker:hover {
@@ -427,7 +461,6 @@ button {
 }
 
 .locations__marker__icon svg {
-
     position: absolute;
     width: 30px;
     object-fit: contain;
@@ -436,7 +469,6 @@ button {
     margin: auto;
     top: 0;
     bottom: 0;
-
 }
 
 .locations__marker__title {
@@ -453,6 +485,7 @@ button {
     background-color: #fff;
     border-radius: 10px;
     overflow: hidden;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 3px 2px;
     transform: translateX(-25%);
 }
 
@@ -469,11 +502,10 @@ button {
     height: 7px;
     z-index: 10;
     cursor: pointer;
-
 }
 
 .swiper-container-horizontal>*>.slider-pagination-bullet {
-    background: none ;
+    background: none;
     border-radius: 100%;
     display: inline-block;
     height: 11px !important;
@@ -483,7 +515,7 @@ button {
     margin: 0 5px;
 }
 
-.slider-pagination-bullet-active{
+.slider-pagination-bullet-active {
     background-color: #fff !important;
 }
 
@@ -553,7 +585,6 @@ button {
 .slider-pagination-bullet {
     background: transparent;
     border: 3px solid #fff;
-
 }
 
 .infoWindow__title {
@@ -573,7 +604,12 @@ button {
 .map__title {
     position: absolute;
     top: 50px;
+    z-index: 20;
     left: 50px;
+}
+
+.bigLeafActive * {
+    fill: #FABDB8;
 }
 
 .map__title h1 {
@@ -591,6 +627,26 @@ button {
 
 .bounce-leave-active {
     animation: bounce-in 0.5s reverse;
+}
+
+.zoomer {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    height: 57px;
+    z-index: 10;
+    width: 30px;
+    background: #FFF4F3;
+    box-shadow: 0 1px 1px 0 rgba(153, 153, 153, 0.50);
+    border-radius: 5.2px;
+
+}
+
+.zoomer button {
+    display: block;
+    height: 28.5px;
+    font-size: 1.4em;
+    width: 30px;
 }
 
 @keyframes bounce-in {
