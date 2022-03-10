@@ -23,7 +23,7 @@
     <!-- MAP TITLE END -->
 
     <!-- WRAP ALL ZOOM ELEMENTS IN HERE -->
-    <panZoom :options="{minZoom: 1, maxZoom: 5,initialZoom: 1, bounds: true, initialY: 550, initialX: 960, boundsPadding: 1,   boundsDisabledForZoom: true,  zoomSpeed: 0.065}">
+    <panZoom @init="onInit" :options="{minZoom: 1, maxZoom: 5,initialZoom: 1, bounds: true, initialY: 550, initialX: 960, boundsPadding: 1,   boundsDisabledForZoom: true}">
         <div class="mapBackground" :style="[{'background-image': 'url(' + require('./assets/map-back.jpg') + ')'}]">
 
             <transitionGroup name="bounce" mode="inOut">
@@ -106,6 +106,13 @@ Vue.use(panZoom);
 export default {
     name: 'App',
     methods: {
+
+        onInit: function (panzoomInstance, id) {
+            panzoomInstance.on('panstart', function (e) {
+                console.log('panzoom', e);
+            });
+        },
+
         zoomInOut(inOut) {
             if (inOut == '+') {
                 this.zoom += 0.2
@@ -309,6 +316,21 @@ export default {
 </script>
 
 <style>
+/* // Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {}
+
+/* // Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {}
+
+/* // Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {}
+
+/* // X-Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {}
+
+/* XX-Large devices (larger desktops, 1400px and up) */
+@media (min-width: 1400px) {}
+
 .rc-anchor-content,
 #cookie-law-info-again,
 #rc-anchor-container,
@@ -334,13 +356,21 @@ export default {
 }
 
 .map {
-    height: 1080px;
-    width: 1920px;
-    border: #000;
+    width: 100%;
+    height: 840px;
     background-color: #e6efdc;
     position: relative;
     overflow: hidden;
+    border: 4px green dashed;
 
+}
+
+@media (min-width: 1920px) {
+    .map {
+        border: 4px red dashed;
+        height: 1080px;
+        width: 1920px;
+    }
 }
 
 .mapBackground {
