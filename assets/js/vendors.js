@@ -459,6 +459,17 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var panz
 
 /***/ }),
 
+/***/ "./node_modules/vue-screen-size/dist/vue-screen-size.esm.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/vue-screen-size/dist/vue-screen-size.esm.js ***!
+  \******************************************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ \"./node_modules/vue/dist/vue.esm.js\");\n\n\nvar reactiveComponent = new vue__WEBPACK_IMPORTED_MODULE_0__[\"default\"]({\n    data: function data() {\n        return {\n            event: null,\n            vssWidth: null,\n            vssHeight: null\n        }\n    }\n});\n\nvar VueScreenSizeMixin = {\n    computed: {\n        $vssEvent: function $vssEvent() {\n            return reactiveComponent.event\n        },\n        $vssWidth: function $vssWidth() {\n            return reactiveComponent.vssWidth || this.getScreenWidth()\n        },\n        $vssHeight: function $vssHeight() {\n            return reactiveComponent.vssHeight || this.getScreenHeight()\n        }\n    },\n    methods: {\n        getScreenWidth: function getScreenWidth() {\n            return window.innerWidth\n            || document.documentElement.clientWidth\n            || document.body.clientWidth\n        },\n        getScreenHeight: function getScreenHeight() {\n            return window.innerHeight\n            || document.documentElement.clientHeight\n            || document.body.clientHeight\n        },\n        handleResize: function handleResize(event) {\n            reactiveComponent.event = event;\n            reactiveComponent.vssWidth = this.getScreenWidth();\n            reactiveComponent.vssHeight = this.getScreenHeight();\n        },\n\n        $vssDestroyListener: function $vssDestroyListener() {\n            window.removeEventListener('resize', this.handleResize);\n        }\n    },\n    mounted: function mounted() {\n        window.addEventListener('resize', this.handleResize);\n    },\n    destroyed: function destroyed() {\n        window.removeEventListener('resize', this.handleResize);\n    }\n}\n\nvar install = function (Vue$$1) {\n    Vue$$1.mixin(VueScreenSizeMixin);\n};\n\n// Note that here we're not only exporting the install function, but\n// also the mixin itself - this is so with can `Vue.use()` or\n// `mixins: [],` it.\nvar index = { install: install, VueScreenSizeMixin: VueScreenSizeMixin }\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (index);\n\n\n//# sourceURL=webpack://vue-wp-starter/./node_modules/vue-screen-size/dist/vue-screen-size.esm.js?");
+
+/***/ }),
+
 /***/ "./node_modules/vue-style-loader/lib/addStylesClient.js":
 /*!**************************************************************!*\
   !*** ./node_modules/vue-style-loader/lib/addStylesClient.js ***!

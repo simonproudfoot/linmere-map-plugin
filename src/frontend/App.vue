@@ -9,8 +9,8 @@
 
     <!-- MAP TITLE -->
     <div class="map__title text-green" :style="{'transform': 'scale('+counterZoom+')'}">
-        <div style="width: 124px; height:118px">
-            <span :class="showFooter ? 'bigLeafActive' : null" v-html="iconLeaf"></span>
+        <div style="">
+            <span class="map__title__leaf" :class="showFooter ? 'bigLeafActive' : null" v-html="iconLeaf"></span>
         </div>
         <fade-transition>
             <span v-show="!showFooter">
@@ -24,7 +24,7 @@
 
     <!-- WRAP ALL ZOOM ELEMENTS IN HERE -->
     <panZoom @init="onInit" :options="{minZoom: 1, maxZoom: 5,initialZoom: 1, bounds: true, initialY: 550, initialX: 960, boundsPadding: 1,   boundsDisabledForZoom: true}">
-        <div class="mapBackground" :style="[{'background-image': 'url(' + require('./assets/map-back.jpg') + ')'}]">
+        <div @mousedown="movingMap(true)" @mouseup="movingMap(false)" class="mapBackground" id="mapBackground" :style="[{'background-image': 'url(' + require('./assets/map-back.jpg') + ')'}]">
 
             <transitionGroup name="bounce" mode="inOut">
                 <template v-for="(cat) in categorys">
@@ -75,15 +75,16 @@
     <!-- INFO WINDOW END -->
     <!-- FOOTER -->
     <slide-y-down-transition>
-        <div v-show="showFooter" class="map__footer">
-            <div v-for="(cat, i) in categorys" :key="i" class="map__footer__item " :class="cat == category_selected ? 'activeIcon' : 'inacitveIcon' " @click="category_selected = cat">
+        <div v-show="showFooter || screenWidth < 1920" class="map__footer">
+            <div v-for="(cat, i) in categorys" :key="i" class="map__footer__item " :class="cat == category_selected ? 'activeIcon' : 'inactiveIcon' " @click="category_selected = cat">
                 <div v-html="cat.icon"></div>
-                <h3 :style="cat == category_selected ? 'opacity: 1' : 'opacity: 0'">{{cat.title.replace('_',' ')}}</h3>
+                <p v-if="screenWidth < 1920">{{cat.title.replace('_',' ')}}</p>
+                <h3 v-else>{{cat.title.replace('_',' ')}}</h3>
             </div>
         </div>
     </slide-y-down-transition>
     <slide-x-left-transition>
-        <div class="filterButton" @click="showFooter = !showFooter">
+        <div v-if="screenWidth > 1920" class="filterButton" @click="showFooter = !showFooter">
             <h3 class="text-green" v-show="!showFooter">FILTER</h3>
             <button v-html="iconVArrow" :class="showFooter ? 'bg-pink' :'bg-green'" style="padding: 18px" class="btn-sq inactiveIcon" :style="!showFooter ? 'transform: rotate(270deg)' : 'transform: rotate(90deg)'"></button>
         </div>
@@ -96,18 +97,21 @@
 import { FadeTransition, SlideXLeftTransition, SlideYDownTransition, CollapseTransition, SlideYUpTransition } from 'vue2-transitions'
 import { slider, slideritem } from 'vue-concise-slider'
 import axios from 'axios';
-// import vue-panzoom
-// import vue-panzoom
 import panZoom from 'vue-panzoom'
+import VueScreenSize from 'vue-screen-size'
 import Vue from 'vue'
 // install plugin
 Vue.use(panZoom);
+Vue.use(VueScreenSize)
 
 export default {
     name: 'App',
     methods: {
-
-        onInit: function (panzoomInstance, id) {
+        movingMap(moving) {
+            var x = moving ? "grabbing" : "grab"
+            document.getElementById("mapBackground").style.cursor = moving
+        },
+        onInit(panzoomInstance, id) {
             panzoomInstance.on('panstart', function (e) {
                 console.log('panzoom', e);
             });
@@ -135,6 +139,13 @@ export default {
         }
     },
 
+    computed: {
+        screenWidth() {
+            return this.$vssWidth
+        }
+
+    },
+
     watch: {
         showFooter() {
             this.location_selected = []
@@ -157,11 +168,11 @@ export default {
         //    let page = await axios.get("/wp-json/wp/v2/pages")
         let page = await axios.get("https://linmere.greenwich-design-projects.co.uk/wp-json/wp/v2/pages")
         let data = await page.data.find(page => page.slug == 'kiosk').acf
-        // houses
-        if (data['houses'])
-            data['houses'].forEach((house) => {
-                this.categorys.find(x => x.title == 'houses').locations.push(house.house)
-            })
+        // // houses
+        // if (data['houses'])
+        //     data['houses'].forEach((house) => {
+        //         this.categorys.find(x => x.title == 'houses').locations.push(house.house)
+        //     })
         // schools
         if (data['schools'])
             data['schools'].forEach((school) => {
@@ -173,15 +184,15 @@ export default {
                 this.categorys.find(x => x.title == 'parks').locations.push(park.park)
             })
         // pets
-        if (data['pets'])
-            data['pets'].forEach((pet) => {
-                this.categorys.find(x => x.title == 'pets').locations.push(pet.pet)
-            })
+        // if (data['pets'])
+        //     data['pets'].forEach((pet) => {
+        //         this.categorys.find(x => x.title == 'pets').locations.push(pet.pet)
+        //     })
         // lidl
-        if (data['lidl'])
-            data['lidl'].forEach((lidl) => {
-                this.categorys.find(x => x.title == 'lidl').locations.push(lidl.lidl)
-            })
+        // if (data['lidl'])
+        //     data['lidl'].forEach((lidl) => {
+        //         this.categorys.find(x => x.title == 'lidl').locations.push(lidl.lidl)
+        //     })
         // cafes
         if (data['cafes'])
             data['cafes'].forEach((cafe) => {
@@ -193,10 +204,10 @@ export default {
                 this.categorys.find(x => x.title == 'allotments').locations.push(allotment.allotment)
             })
         // bikes
-        if (data['bikes'])
-            data['bikes'].forEach((bike) => {
-                this.categorys.find(x => x.title == 'bikes').locations.push(bike.bike)
-            })
+        // if (data['bikes'])
+        //     data['bikes'].forEach((bike) => {
+        //         this.categorys.find(x => x.title == 'bikes').locations.push(bike.bike)
+        //     })
         // parking
         if (data['parking'])
             data['parking'].forEach((parking) => {
@@ -208,10 +219,10 @@ export default {
                 this.categorys.find(x => x.title == 'bus_stops').locations.push(bus_stop.bus_stop)
             })
         // station
-        if (data['station'])
-            data['station'].forEach((station) => {
-                this.categorys.find(x => x.title == 'station').locations.push(station.station)
-            })
+        // if (data['station'])
+        //     data['station'].forEach((station) => {
+        //         this.categorys.find(x => x.title == 'station').locations.push(station.station)
+        //     })
     },
     data: function () {
         return {
@@ -229,13 +240,14 @@ export default {
                 contact_details: false
             },
             tabSelected: null,
-            categorys: [{
-                    title: 'houses',
-                    iconColor: '#000',
-                    iconsSize: '38px',
-                    icon: require('./assets/SVG/houses.svg'),
-                    locations: [],
-                },
+            categorys: [
+                // {
+                //     title: 'houses',
+                //     iconColor: '#000',
+                //     iconsSize: '38px',
+                //     icon: require('./assets/SVG/houses.svg'),
+                //     locations: [],
+                // },
                 {
                     title: 'schools',
                     iconsSize: '38px',
@@ -250,20 +262,20 @@ export default {
                     iconsSize: '27px',
                     locations: [],
                 },
-                {
-                    title: 'pets',
-                    icon: require('./assets/SVG/pets.svg'),
-                    iconColor: '#b77671',
-                    iconsSize: '38px',
-                    locations: [],
-                },
-                {
-                    title: 'lidl',
-                    icon: require('./assets/SVG/lidl.svg'),
-                    iconColor: '#b77671',
-                    iconsSize: '38px',
-                    locations: [],
-                },
+                // {
+                //     title: 'pets',
+                //     icon: require('./assets/SVG/pets.svg'),
+                //     iconColor: '#b77671',
+                //     iconsSize: '38px',
+                //     locations: [],
+                // },
+                // {
+                //     title: 'lidl',
+                //     icon: require('./assets/SVG/lidl.svg'),
+                //     iconColor: '#b77671',
+                //     iconsSize: '38px',
+                //     locations: [],
+                // },
                 {
                     title: 'cafes',
                     icon: require('./assets/SVG/cafes.svg'),
@@ -278,13 +290,13 @@ export default {
                     iconsSize: '38px',
                     locations: [],
                 },
-                {
-                    title: 'bikes',
-                    icon: require('./assets/SVG/bikes.svg'),
-                    iconColor: '#b77671',
-                    iconsSize: '38px',
-                    locations: [],
-                },
+                // {
+                //     title: 'bikes',
+                //     icon: require('./assets/SVG/bikes.svg'),
+                //     iconColor: '#b77671',
+                //     iconsSize: '38px',
+                //     locations: [],
+                // },
                 {
                     title: 'parking',
                     icon: require('./assets/SVG/parking.svg'),
@@ -293,19 +305,19 @@ export default {
                     locations: [],
                 },
                 {
-                    title: 'bus stops',
+                    title: 'bus',
                     icon: require('./assets/SVG/bus_stops.svg'),
                     iconColor: '#000',
                     iconsSize: '38px',
                     locations: [],
                 },
-                {
-                    title: 'station',
-                    icon: require('./assets/SVG/station.svg'),
-                    iconColor: '#000',
-                    iconsSize: '38px',
-                    locations: [],
-                }
+                // {
+                //     title: 'station',
+                //     icon: require('./assets/SVG/station.svg'),
+                //     iconColor: '#000',
+                //     iconsSize: '38px',
+                //     locations: [],
+                // }
             ],
             iconClose: require('./assets/SVG/close.svg'),
             iconVArrow: require('./assets/SVG/v-arrow.svg'),
@@ -357,17 +369,14 @@ export default {
 
 .map {
     width: 100%;
-    height: 840px;
+    height: 640px;
     background-color: #e6efdc;
     position: relative;
     overflow: hidden;
-    border: 4px green dashed;
-
 }
 
 @media (min-width: 1920px) {
     .map {
-        border: 4px red dashed;
         height: 1080px;
         width: 1920px;
     }
@@ -378,13 +387,13 @@ export default {
     width: 1920px;
     background-size: cover;
     background-repeat: no-repeat;
-
+    cursor: grab;
 }
 
 .map__footer {
-    background-color: #00745F;
+    background-color: #fff;
+    border: 1px #F6F6F6 solid;
     width: 100%;
-    height: 168px;
     position: absolute;
     bottom: 0;
     left: 0;
@@ -392,33 +401,84 @@ export default {
     list-style: none;
     margin: 0 !important;
     display: flex;
-    padding-left: 200px;
+    justify-content: space-around;
 }
 
 .map__footer__item {
-    padding-top: 10px;
-    height: auto;
+    height: 75px;
     text-align: center;
-    color: #fff;
-    padding-top: 2.5em;
-    width: 149px;
+    color: #00745F;
+    padding-top: 15px;
+    width: 50px;
     cursor: pointer;
-    transition-duration: 0.2s;
+
 }
 
-.map__footer__item:hover {
-    transform: scale(1.1);
+.map__footer__item:hover svg {
+        border-color: #043C2C;
+}
+
+.map__footer__item:hover h3 {
+        color: #043C2C;
 }
 
 .map__footer h3 {
     font-size: 20px !important;
     margin-top: 5px;
+        transition-duration: 0.2s;
 }
 
 .map__footer__item svg {
-    height: 70px;
-    width: 70px;
+    height: 35px;
+    width: 35px;
+    border: 1px solid #00745F;
     margin: auto;
+    padding: 3px;
+    border-radius: 100%;
+    transition-duration: 0.2s;
+}
+
+.map__footer p {
+    font-size: 11px !important;
+}
+
+@media (min-width: 1920px) {
+    .map__footer {
+        background-color: #00745F;
+        height: 168px;
+        padding-left: 200px;
+        justify-content: flex-start;
+        border: none;
+    }
+
+    .map__footer__item svg {
+        height: 70px;
+        width: 70px;
+        margin: auto;
+        border-color: #fff;
+        border-width: 3px;
+        padding: 10px;
+
+    }
+
+    .map__footer__item {
+        width: 149px;
+        color: #fff;
+        padding-top: 2.5em
+    }
+
+    .inactiveIcon * {
+        fill: #fff;
+        color: #fff;
+    }
+
+}
+
+@media (max-width: 1920px) {
+    .inactiveIcon * {
+        fill: #00745F;
+        color: #00745F;
+    }
 }
 
 .fillPink {
@@ -431,14 +491,13 @@ export default {
     color: #00745F !important;
 }
 
-.inactiveIcon * {
-    fill: #fff !important;
-    color: #fff !important;
+.activeIcon * {
+    color: #FABDB8 !important;
 }
 
-.activeIcon * {
-    fill: #FABDB8 !important;
-    color: #FABDB8 !important;
+.activeIcon svg {
+    background-color: #B77670;
+    border-color: #043C2C;
 }
 
 button {
@@ -638,6 +697,28 @@ button {
     left: 50px;
 }
 
+.map__title__leaf svg {
+    width: 124px;
+    height: 118px
+}
+
+@media (max-width: 1920px) {
+    .map__title {
+        left: 5px;
+        top: 5px;
+    }
+
+    .map__title h1 {
+        display: none !important;
+    }
+
+    .map__title__leaf svg {
+        width: 60px;
+        height: 70px
+    }
+
+}
+
 .bigLeafActive * {
     fill: #FABDB8;
 }
@@ -661,7 +742,7 @@ button {
 
 .zoomer {
     position: absolute;
-    bottom: 10px;
+    top: 10px;
     right: 10px;
     height: 57px;
     z-index: 10;
