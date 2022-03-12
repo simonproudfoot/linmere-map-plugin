@@ -1,4 +1,4 @@
-<template>
+<address></address><template>
   <div id="vue-backend-app">
     <h1>Backend App</h1>
 

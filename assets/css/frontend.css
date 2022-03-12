@@ -328,6 +328,57 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* // Small devices (landscape phones, 576px and up) */
 @media (min-width: 576px) {}
 
@@ -377,6 +428,7 @@
 .mapBackground {
     height: 1080px;
     width: 1920px;
+
     background-size: cover;
     background-repeat: no-repeat;
     cursor: grab;
@@ -403,15 +455,15 @@
     cursor: pointer;
 }
 .map__footer__item:hover svg {
-        border-color: #043C2C;
+    border-color: #043C2C;
 }
 .map__footer__item:hover h3 {
-        color: #043C2C;
+    color: #043C2C;
 }
 .map__footer h3 {
     font-size: 20px !important;
     margin-top: 5px;
-        transition-duration: 0.2s;
+    transition-duration: 0.2s;
 }
 .map__footer__item svg {
     height: 35px;
