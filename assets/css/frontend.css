@@ -359,26 +359,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* // Small devices (landscape phones, 576px and up) */
 @media (min-width: 576px) {}
 
@@ -456,9 +436,9 @@
 }
 .map__footer__item:hover svg {
     border-color: #043C2C;
-     fill: #043C2C;
+    fill: #043C2C;
 }
-.map__footer__item:hover svg *{
+.map__footer__item:hover svg * {
     fill: #043C2C;
 }
 .map__footer__item:hover h3 {

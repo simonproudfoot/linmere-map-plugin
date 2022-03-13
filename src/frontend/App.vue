@@ -1,5 +1,5 @@
 <template>
-<div class="map" id="vue-frontend-app">
+<div @click="activatePan()" class="map" id="vue-frontend-app">
     <!-- zoom buttons -->
     <div class="zoomer">
         <button @click="zoomInOut('+')">+</button>
@@ -18,22 +18,8 @@
             </span>
         </fade-transition>
     </div>
-    <!-- MAP TITLE END -->
-    <!-- WRAP ALL ZOOM ELEMENTS IN HERE -->
-    <!-- <panZoom @init="onInit" :options="{minZoom: 1, maxZoom: 5,mapBackground, bounds: true, initialY: 550, initialX: 960, boundsPadding: 1,   boundsDisabledForZoom: true}">
-        <div @mousedown="movingMap(true)" @mouseup="movingMap(false)" class="mapBackground" id="mapBackground" :style="[{'background-image': 'url(' + require('./assets/map-back.jpg') + ')'}]">
-            <transitionGroup name="bounce" mode="inOut">
-                <template v-for="(cat) in categorys">
-                    <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
-                        <div class="locations__marker__icon" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
-                        <h4 class="locations__marker__title">{{location.title}}</h4>
-                    </div>
-                </template>
-            </transitionGroup>
-        </div>
-    </panZoom> -->
-    <!-- minZoom: 1, maxZoom: 5,initialZoom: 1, bounds: true, initialY: 550, initialX: 960, boundsPadding: 1,   boundsDisabledForZoom: true,  -->
-    <panZoom @init="onInit" :options="{autocenter: true, bounds: true}">
+
+    <panZoom @init="onInit" :options="{autocenter: screenWidth >= 1920 ? false : true, bounds: true, initialY: screenWidth >= 1920 ? 0 : null, initialX: screenWidth >= 1920 ? -3 : null, initialZoom: screenWidth >= 1920 ? 1 : null}">
         <div class="mapBackground" id="mapBackground" :style="[{'background-image': 'url(' + require('./assets/map-back.jpg') + ')'}]">
             <transitionGroup name="bounce" mode="inOut">
                 <template v-for="(cat) in categorys">
@@ -93,7 +79,7 @@
     </slide-y-down-transition>
     <slide-x-left-transition>
         <div v-if="screenWidth > 1920" class="filterButton" @click="showFooter = !showFooter">
-            <h3 class="text-green" v-show="!showFooter">FILTER {{mapHeight}}</h3>
+            <h3 class="text-green" v-show="!showFooter">FILTER</h3>
             <button v-html="iconVArrow" :class="showFooter ? 'bg-pink' :'bg-green'" style="padding: 18px" class="btn-sq inactiveIcon" :style="!showFooter ? 'transform: rotate(270deg)' : 'transform: rotate(90deg)'"></button>
         </div>
     </slide-x-left-transition>
@@ -114,41 +100,29 @@ Vue.use(VueScreenSize)
 export default {
     name: 'App',
     methods: {
+
+        activatePan() {
+            this.panner.resume();
+        },
+        deactivatePan() {
+            this.panner.pause();
+        },
         getDimensions() {
             this.windowWidth = document.getElementById('vue-frontend-app').offsetWidth;
             this.windowHeight = document.getElementById('vue-frontend-app').offsetHeight;
         },
         onInit(panzoomInstance, id) {
 
-            var viewPort = document.getElementById('vue-frontend-app');
-            var map = document.getElementById('mapBackground');
-            const btnIn = document.getElementById('zoomIn')
-            const btnOut = document.getElementById('zoomOut')
-
-            this.zoom = Math.min(
-                viewPort.offsetWidth / map.offsetWidth,
-                viewPort.offsetHeight / map.offsetHeight
-            );
-
-            // this.transform = { 'transform': `translate(-50%, -50%) scale(` + this.zoom + `)` }
-
-            // map.style.left = `50%`;
-            // map.style.top = `50%`;
-
             this.panner = panzoomInstance
 
-            this.panner.moveTo(this.panner.getTransform().x, 0)
-            //   alert(this.zoom)
+            this.panner.setTransformOrigin({ x: 0.5, y: 0.5 })
 
-            // if (this.screenWidth > 768) {
-
-            setTimeout(() => {
-                viewPort.style.height = map.getBoundingClientRect().height + 77 + 'px'
-            }, 100);
-
-            //   }
-
-            console.log(this.panner)
+            if (this.screenWidth < 800) {
+                this.panner.smoothMoveTo(this.panner.getTransform().x, 160)
+            } else {
+                this.panner.smoothMoveTo(this.panner.getTransform().x, 0)
+            }
+            this.deactivatePan()
 
             panzoomInstance.on('panstart', function (e) {
                 document.getElementById("mapBackground").style.cursor = "grabbing"
@@ -156,16 +130,20 @@ export default {
             panzoomInstance.on('panend', function (e) {
                 console.log(panzoomInstance.getTransform())
                 document.getElementById("mapBackground").style.cursor = "grab"
-                //   console.log(panzoomInstance.get.getTransform())
+
             });
         },
 
         zoomInOut(inOut) {
+            var y = document.getElementById('vue-frontend-app').clientHeight / 2
+            var x = document.getElementById('vue-frontend-app').clientWidth / 2
+
+            let current = this.panner.getTransform().scale
             if (inOut == '+') {
                 //  this.zoom += 0.2
-                this.panner.smoothZoom(0, 0, 0.5);
+                this.panner.smoothZoom(x, y, current += 0.1);
             } else {
-                this.panner.smoothZoom(0, 0, -0.5);
+                this.panner.smoothZoom(x, y, current = -0.1);
             }
         },
         popUp(location) {
@@ -208,10 +186,12 @@ export default {
         CollapseTransition
     },
     mounted() {
-        alert('write function to watch if out of bounds and zoom back to center if so ')
-        alert('write function zoom to full sizr on kiosk')
+        //  alert('write function to watch if out of bounds and zoom back to center if so ')
+        //   alert('write function zoom to full sizr on kiosk')
     },
     async created() {
+
+      //  alert(this.screenWidth)
 
         let page = await axios.get("https://linmere.greenwich-design-projects.co.uk/wp-json/wp/v2/pages")
         let data = await page.data.find(page => page.slug == 'kiosk').acf
@@ -467,10 +447,10 @@ export default {
 
 .map__footer__item:hover svg {
     border-color: #043C2C;
-     fill: #043C2C;
+    fill: #043C2C;
 }
 
-.map__footer__item:hover svg *{
+.map__footer__item:hover svg * {
     fill: #043C2C;
 }
 
