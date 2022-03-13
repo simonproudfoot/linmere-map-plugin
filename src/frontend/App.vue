@@ -461,12 +461,17 @@ export default {
     text-align: center;
     color: #00745F;
     padding-top: 15px;
-    width: 50px;
+    width: 100px;
     cursor: pointer;
 }
 
 .map__footer__item:hover svg {
     border-color: #043C2C;
+     fill: #043C2C;
+}
+
+.map__footer__item:hover svg *{
+    fill: #043C2C;
 }
 
 .map__footer__item:hover h3 {
@@ -512,7 +517,7 @@ export default {
     }
 
     .map__footer__item {
-        width: 149px;
+        width: 170px;
         color: #fff;
         padding-top: 2.5em
     }
