@@ -124,6 +124,8 @@ export default {
             }
             this.deactivatePan()
 
+            console.log(this.panner)
+
             panzoomInstance.on('panstart', function (e) {
                 document.getElementById("mapBackground").style.cursor = "grabbing"
             });
@@ -138,12 +140,17 @@ export default {
             var y = document.getElementById('vue-frontend-app').clientHeight / 2
             var x = document.getElementById('vue-frontend-app').clientWidth / 2
 
-            let current = this.panner.getTransform().scale
+            let current = (Math.round(this.panner.getTransform().scale))
+
+            console.log(current)
+
             if (inOut == '+') {
-                //  this.zoom += 0.2
-                this.panner.smoothZoom(x, y, current += 0.1);
-            } else {
-                this.panner.smoothZoom(x, y, current = -0.1);
+
+                this.panner.smoothZoom(x, y, 1.2);
+            }
+            if (inOut == '-') {
+
+                this.panner.smoothZoom(x, y, 0.8);
             }
         },
         popUp(location) {
@@ -191,7 +198,7 @@ export default {
     },
     async created() {
 
-      //  alert(this.screenWidth)
+        //  alert(this.screenWidth)
 
         let page = await axios.get("https://linmere.greenwich-design-projects.co.uk/wp-json/wp/v2/pages")
         let data = await page.data.find(page => page.slug == 'kiosk').acf
