@@ -414,7 +414,11 @@
 .map {
     width: 100%;
     height: 640px;
-    background-color: #e6efdc;
+    background: rgb(255, 255, 255);
+    background: -moz-linear-gradient(0deg, rgba(255, 255, 255, 1) 54%, rgba(227, 237, 249, 1) 100%);
+    background: -webkit-linear-gradient(0deg, rgba(255, 255, 255, 1) 54%, rgba(227, 237, 249, 1) 100%);
+    background: linear-gradient(0deg, rgba(255, 255, 255, 1) 54%, rgba(227, 237, 249, 1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffffff", endColorstr="#e3edf9", GradientType=1);
     position: relative;
     overflow: hidden;
 }
@@ -510,8 +514,6 @@
         border-top: 3px #043C2C solid;
         margin-top: -3px;
 }
-.activeIcon .map__footer__item{
-}
 .map__footer p {
         font-weight: bolder !important;
         text-transform: capitalize;
@@ -595,6 +597,7 @@ button {
     margin-top: 13px;
 }
 .infoWindowSmall {
+    border: 1px #F6F6F6 solid;
     width: calc(100%-1em);
     position: absolute;
     bottom: 100px;
@@ -608,7 +611,7 @@ button {
     display: flex;
 }
 .infoWindowSmall__inner {
-    padding: 1em 2em 1em 1em;
+    padding: 1em 3em 1em 1em;
     display: inline-block;
 }
 .infoWindowSmall__inner p {

@@ -419,7 +419,11 @@ export default {
 .map {
     width: 100%;
     height: 640px;
-    background-color: #e6efdc;
+    background: rgb(255, 255, 255);
+    background: -moz-linear-gradient(0deg, rgba(255, 255, 255, 1) 54%, rgba(227, 237, 249, 1) 100%);
+    background: -webkit-linear-gradient(0deg, rgba(255, 255, 255, 1) 54%, rgba(227, 237, 249, 1) 100%);
+    background: linear-gradient(0deg, rgba(255, 255, 255, 1) 54%, rgba(227, 237, 249, 1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffffff", endColorstr="#e3edf9", GradientType=1);
     position: relative;
     overflow: hidden;
 }
@@ -496,6 +500,7 @@ export default {
 }
 
 @media (min-width: 1920px) {
+
     .map__footer {
         background-color: #00745F;
         height: 168px;
@@ -526,15 +531,9 @@ export default {
 }
 
 @media (max-width: 1920px) {
-
     .map__footer__item.activeIcon {
         border-top: 3px #043C2C solid;
         margin-top: -3px;
-    }
-
-    .activeIcon .map__footer__item{
-        
-
     }
 
     .map__footer p {
@@ -635,6 +634,7 @@ button {
 }
 
 .infoWindowSmall {
+    border: 1px #F6F6F6 solid;
     width: calc(100%-1em);
     position: absolute;
     bottom: 100px;
@@ -649,7 +649,7 @@ button {
 }
 
 .infoWindowSmall__inner {
-    padding: 1em 2em 1em 1em;
+    padding: 1em 3em 1em 1em;
     display: inline-block;
 }
 
