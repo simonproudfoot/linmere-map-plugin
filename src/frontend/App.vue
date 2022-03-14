@@ -31,6 +31,7 @@
         </div>
     </panZoom>
     <!-- MAP ELEMENTS END -->
+
     <!--INFO WINDOW -->
     <fade-transition>
         <div v-if="Object.keys(location_selected).length && screenWidth > 1920" class="infoWindow" :style="{left: location_selected.x+'px'}">
@@ -69,9 +70,9 @@
 
     <!--INFO WINDOW SMALL-->
     <slide-y-down-transition>
-        <div v-if="Object.keys(location_selected).length && screenWidth < 1920" class="infoWindowSmall" :style="screenWidth > 800 && screenWidth < 1920 && showFooter ? 'bottom: 180px' : '100px'">
+        <div v-if="Object.keys(location_selected).length && screenWidth < 1920" class="infoWindowSmall">
             <button class="infoWindow__close" @click="popUp()">
-                <div v-html="iconClose"></div>
+                <div class="darkBtn" v-html="iconClose"></div>
             </button>
             <img :src="location_selected.images[0].sizes.thumbnail">
             <div class="infoWindowSmall__inner">
@@ -85,16 +86,16 @@
 
     <!-- FOOTER -->
     <slide-y-down-transition>
-        <div v-show="showFooter || screenWidth < 800 " class="map__footer">
+        <div v-show="showFooter || screenWidth < 1920" id="map__footer" class="map__footer">
             <div v-for="(cat, i) in categorys" :key="i" class="map__footer__item" :class="cat == category_selected ? 'activeIcon' : 'inactiveIcon' " @click="category_selected = cat">
                 <div v-html="cat.icon"></div>
-                <p v-if="screenWidth < 800">{{cat.title.replace('_',' ')}}</p>
+                <p v-if="screenWidth < 1920">{{cat.title.replace('_',' ')}}</p>
                 <h3 v-else>{{cat.title.replace('_',' ')}}</h3>
             </div>
         </div>
     </slide-y-down-transition>
     <slide-x-left-transition>
-        <div v-if="screenWidth > 800 && !Object.keys(location_selected).length" class="filterButton" @click="showFooter = !showFooter">
+        <div v-if="screenWidth > 1920" class="filterButton" @click="showFooter = !showFooter">
             <h3 class="text-green" v-show="!showFooter">FILTER</h3>
             <button v-html="iconVArrow" :class="showFooter ? 'bg-pink' :'bg-green'" style="padding: 18px" class="btn-sq inactiveIcon" :style="!showFooter ? 'transform: rotate(270deg)' : 'transform: rotate(90deg)'"></button>
         </div>
@@ -147,6 +148,9 @@ export default {
                 console.log(panzoomInstance.getTransform())
                 document.getElementById("mapBackground").style.cursor = "grab"
             });
+
+            let el = document.getElementById('vue-frontend-app');
+
         },
         zoomInOut(inOut) {
             let scale = this.panner.getTransform().scale
@@ -174,6 +178,9 @@ export default {
         }
     },
     computed: {
+        kioskMode() {
+            return window.location.href.indexOf("kiosk") > -1 ? true : false
+        },
         screenWidth() {
             return this.$vssWidth
         },
@@ -199,13 +206,17 @@ export default {
         SlideYUpTransition,
         CollapseTransition
     },
-    mounted() {
-        //  alert('write function to watch if out of bounds and zoom back to center if so ')
-        //   alert('write function zoom to full sizr on kiosk')
-    },
-    async created() {
 
+    async created() {
         window.addEventListener("resize", this.resizeMap);
+
+        // setTimeout(() => {
+        //     let mapWindowH = document.getElementById('vue-frontend-app').offsetHeight
+        //     let footerH = document.getElementById('map__footer').offsetHeight
+        //     let map =  document.getElementById('mapBackground')
+        //     map.style.height = mapWindowH + 'px'
+        // }, 2000);
+
         //  alert(this.screenWidth)
         let page = await axios.get("https://linmere.greenwich-design-projects.co.uk/wp-json/wp/v2/pages")
         let data = await page.data.find(page => page.slug == 'kiosk').acf
@@ -388,13 +399,6 @@ export default {
 /* XX-Large devices (larger desktops, 1400px and up) */
 @media (min-width: 1400px) {}
 
-.rc-anchor-content,
-#cookie-law-info-again,
-#rc-anchor-container,
-#cookie-law-info-bar {
-    display: none !important;
-}
-
 .bg-green {
     background-color: #00745F;
 }
@@ -480,9 +484,9 @@ export default {
 .map__footer__item svg {
     height: 35px;
     width: 35px;
-    border: 1px solid #00745F;
+    border: 1.5px solid #00745F;
     margin: auto;
-    padding: 3px;
+    padding: 5px;
     border-radius: 100%;
     transition-duration: 0.2s;
 }
@@ -491,7 +495,7 @@ export default {
     font-size: 11px !important;
 }
 
-@media (min-width: 800px) {
+@media (min-width: 1920px) {
     .map__footer {
         background-color: #00745F;
         height: 168px;
@@ -521,10 +525,27 @@ export default {
     }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1920px) {
+
+    .map__footer__item.activeIcon {
+        border-top: 3px #043C2C solid;
+        margin-top: -3px;
+    }
+
+    .activeIcon .map__footer__item{
+        
+
+    }
+
+    .map__footer p {
+        font-weight: bolder !important;
+        text-transform: capitalize;
+        margin-top: -5px;
+    }
+
     .inactiveIcon * {
-        fill: #00745F;
-        color: #00745F;
+        fill: #043C2C;
+        color: #043C2C;
     }
 }
 
@@ -628,13 +649,16 @@ button {
 }
 
 .infoWindowSmall__inner {
-    padding: 1em;
-
+    padding: 1em 2em 1em 1em;
     display: inline-block;
 }
 
 .infoWindowSmall__inner p {
     line-height: 1 !important;
+}
+
+.infoWindowSmall__inner p:last-of-type() {
+    margin-bottom: 0 !important;
 }
 
 .infoWindow {
@@ -742,6 +766,12 @@ button {
     height: 20px;
 }
 
+.darkBtn * {
+
+    stroke: black;
+
+}
+
 .slider-pagination-bullet {
     background: transparent;
     border: 3px solid #fff;
@@ -833,7 +863,7 @@ button {
     top: 10px;
     right: 10px;
     height: 57px;
-    z-index: 10;
+    z-index: 4;
     width: 30px;
     background: #FFF4F3;
     box-shadow: 0 1px 1px 0 rgba(153, 153, 153, 0.50);

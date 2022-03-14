@@ -373,6 +373,17 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 /* // Small devices (landscape phones, 576px and up) */
 @media (min-width: 576px) {}
 
@@ -387,12 +398,6 @@
 
 /* XX-Large devices (larger desktops, 1400px and up) */
 @media (min-width: 1400px) {}
-.rc-anchor-content,
-#cookie-law-info-again,
-#rc-anchor-container,
-#cookie-law-info-bar {
-    display: none !important;
-}
 .bg-green {
     background-color: #00745F;
 }
@@ -465,16 +470,16 @@
 .map__footer__item svg {
     height: 35px;
     width: 35px;
-    border: 1px solid #00745F;
+    border: 1.5px solid #00745F;
     margin: auto;
-    padding: 3px;
+    padding: 5px;
     border-radius: 100%;
     transition-duration: 0.2s;
 }
 .map__footer p {
     font-size: 11px !important;
 }
-@media (min-width: 800px) {
+@media (min-width: 1920px) {
 .map__footer {
         background-color: #00745F;
         height: 168px;
@@ -500,10 +505,21 @@
         color: #fff;
 }
 }
-@media (max-width: 800px) {
+@media (max-width: 1920px) {
+.map__footer__item.activeIcon {
+        border-top: 3px #043C2C solid;
+        margin-top: -3px;
+}
+.activeIcon .map__footer__item{
+}
+.map__footer p {
+        font-weight: bolder !important;
+        text-transform: capitalize;
+        margin-top: -5px;
+}
 .inactiveIcon * {
-        fill: #00745F;
-        color: #00745F;
+        fill: #043C2C;
+        color: #043C2C;
 }
 }
 .fillPink {
@@ -592,12 +608,14 @@ button {
     display: flex;
 }
 .infoWindowSmall__inner {
-    padding: 1em;
-
+    padding: 1em 2em 1em 1em;
     display: inline-block;
 }
 .infoWindowSmall__inner p {
     line-height: 1 !important;
+}
+.infoWindowSmall__inner p:last-of-type() {
+    margin-bottom: 0 !important;
 }
 .infoWindow {
     position: absolute;
@@ -689,6 +707,10 @@ button {
     cursor: pointer;
     height: 20px;
 }
+.darkBtn * {
+
+    stroke: black;
+}
 .slider-pagination-bullet {
     background: transparent;
     border: 3px solid #fff;
@@ -764,7 +786,7 @@ button {
     top: 10px;
     right: 10px;
     height: 57px;
-    z-index: 10;
+    z-index: 4;
     width: 30px;
     background: #FFF4F3;
     box-shadow: 0 1px 1px 0 rgba(153, 153, 153, 0.50);
