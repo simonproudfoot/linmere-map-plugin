@@ -366,6 +366,13 @@
 
 
 
+
+
+
+
+
+
+
 /* // Small devices (landscape phones, 576px and up) */
 @media (min-width: 576px) {}
 
@@ -415,7 +422,6 @@
 .mapBackground {
     height: 1080px;
     width: 1920px;
-
     background-size: cover;
     background-repeat: no-repeat;
     cursor: grab;
@@ -468,7 +474,7 @@
 .map__footer p {
     font-size: 11px !important;
 }
-@media (min-width: 1920px) {
+@media (min-width: 800px) {
 .map__footer {
         background-color: #00745F;
         height: 168px;
@@ -494,7 +500,7 @@
         color: #fff;
 }
 }
-@media (max-width: 1920px) {
+@media (max-width: 800px) {
 .inactiveIcon * {
         fill: #00745F;
         color: #00745F;
@@ -571,6 +577,27 @@ button {
     color: #2c2e2c;
     font-size: 26px;
     margin-top: 13px;
+}
+.infoWindowSmall {
+    width: calc(100%-1em);
+    position: absolute;
+    bottom: 100px;
+    box-shadow: 0 1px 1px 0 rgba(187, 185, 185, 0.50);
+    min-height: 111px;
+    left: 1em;
+    right: 1em;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+}
+.infoWindowSmall__inner {
+    padding: 1em;
+
+    display: inline-block;
+}
+.infoWindowSmall__inner p {
+    line-height: 1 !important;
 }
 .infoWindow {
     position: absolute;
@@ -677,6 +704,21 @@ button {
 .infoWindow__inner {
     padding: 0 20px 10px 20px;
     color: #005A44;
+}
+@media (max-width: 800px) {
+.infoWindow {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        top: unset;
+        min-height: 400px;
+        background-color: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 3px 2px;
+        transform: translateX(0);
+}
 }
 .map__title {
     position: absolute;

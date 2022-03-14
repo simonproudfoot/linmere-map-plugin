@@ -18,9 +18,8 @@
             </span>
         </fade-transition>
     </div>
-
     <panZoom @init="onInit" :options="{autocenter: screenWidth >= 1920 ? false : true, bounds: true, initialY: screenWidth >= 1920 ? 0 : null, initialX: screenWidth >= 1920 ? -3 : null, initialZoom: screenWidth >= 1920 ? 1 : null}">
-        <div class="mapBackground" id="mapBackground" :style="[{'background-image': 'url(' + require('./assets/map-back.jpg') + ')'}]">
+        <div class="mapBackground" id="mapBackground" :style="[{'background-image': 'url(' + require('./assets/map.jpg') + ')'}]">
             <transitionGroup name="bounce" mode="inOut">
                 <template v-for="(cat) in categorys">
                     <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
@@ -34,7 +33,7 @@
     <!-- MAP ELEMENTS END -->
     <!--INFO WINDOW -->
     <fade-transition>
-        <div v-if="Object.keys(location_selected).length" class="infoWindow" :style="{left: location_selected.x+'px'}">
+        <div v-if="Object.keys(location_selected).length && screenWidth > 1920" class="infoWindow" :style="{left: location_selected.x+'px'}">
             <button class="infoWindow__close" @click="popUp()">
                 <div v-html="iconClose"></div>
             </button>
@@ -67,18 +66,35 @@
         </div>
     </fade-transition>
     <!-- INFO WINDOW END -->
+
+    <!--INFO WINDOW SMALL-->
+    <slide-y-down-transition>
+        <div v-if="Object.keys(location_selected).length && screenWidth < 1920" class="infoWindowSmall" :style="screenWidth > 800 && screenWidth < 1920 && showFooter ? 'bottom: 180px' : '100px'">
+            <button class="infoWindow__close" @click="popUp()">
+                <div v-html="iconClose"></div>
+            </button>
+            <img :src="location_selected.images[0].sizes.thumbnail">
+            <div class="infoWindowSmall__inner">
+                <h3>{{location_selected.longTitle}}</h3>
+                <p v-html="location_selected.description"></p>
+
+            </div>
+        </div>
+    </slide-y-down-transition>
+    <!--INFO WINDOW SMALL END-->
+
     <!-- FOOTER -->
     <slide-y-down-transition>
-        <div v-show="showFooter || screenWidth < 1920" class="map__footer">
-            <div v-for="(cat, i) in categorys" :key="i" class="map__footer__item " :class="cat == category_selected ? 'activeIcon' : 'inactiveIcon' " @click="category_selected = cat">
+        <div v-show="showFooter || screenWidth < 800 " class="map__footer">
+            <div v-for="(cat, i) in categorys" :key="i" class="map__footer__item" :class="cat == category_selected ? 'activeIcon' : 'inactiveIcon' " @click="category_selected = cat">
                 <div v-html="cat.icon"></div>
-                <p v-if="screenWidth < 1920">{{cat.title.replace('_',' ')}}</p>
+                <p v-if="screenWidth < 800">{{cat.title.replace('_',' ')}}</p>
                 <h3 v-else>{{cat.title.replace('_',' ')}}</h3>
             </div>
         </div>
     </slide-y-down-transition>
     <slide-x-left-transition>
-        <div v-if="screenWidth > 1920" class="filterButton" @click="showFooter = !showFooter">
+        <div v-if="screenWidth > 800 && !Object.keys(location_selected).length" class="filterButton" @click="showFooter = !showFooter">
             <h3 class="text-green" v-show="!showFooter">FILTER</h3>
             <button v-html="iconVArrow" :class="showFooter ? 'bg-pink' :'bg-green'" style="padding: 18px" class="btn-sq inactiveIcon" :style="!showFooter ? 'transform: rotate(270deg)' : 'transform: rotate(90deg)'"></button>
         </div>
@@ -100,7 +116,13 @@ Vue.use(VueScreenSize)
 export default {
     name: 'App',
     methods: {
-
+        resizeMap() {
+            if (this.screenWidth < 800) {
+                this.panner.smoothMoveTo(this.panner.getTransform().x, 160)
+            } else {
+                this.panner.smoothMoveTo(this.panner.getTransform().x, 0)
+            }
+        },
         activatePan() {
             this.panner.resume();
         },
@@ -112,45 +134,30 @@ export default {
             this.windowHeight = document.getElementById('vue-frontend-app').offsetHeight;
         },
         onInit(panzoomInstance, id) {
-
             this.panner = panzoomInstance
-
             this.panner.setTransformOrigin({ x: 0.5, y: 0.5 })
-
-            if (this.screenWidth < 800) {
-                this.panner.smoothMoveTo(this.panner.getTransform().x, 160)
-            } else {
-                this.panner.smoothMoveTo(this.panner.getTransform().x, 0)
-            }
+            this.panner.setZoomSpeed(0.01)
+            this.resizeMap()
             this.deactivatePan()
-
             console.log(this.panner)
-
-            panzoomInstance.on('panstart', function (e) {
+            this.panner.on('panstart', function (e) {
                 document.getElementById("mapBackground").style.cursor = "grabbing"
             });
-            panzoomInstance.on('panend', function (e) {
+            this.panner.on('panend', function (e) {
                 console.log(panzoomInstance.getTransform())
                 document.getElementById("mapBackground").style.cursor = "grab"
-
             });
         },
-
         zoomInOut(inOut) {
+            let scale = this.panner.getTransform().scale
             var y = document.getElementById('vue-frontend-app').clientHeight / 2
             var x = document.getElementById('vue-frontend-app').clientWidth / 2
-
-            let current = (Math.round(this.panner.getTransform().scale))
-
-            console.log(current)
-
-            if (inOut == '+') {
-
-                this.panner.smoothZoom(x, y, 1.2);
+            console.log(scale)
+            if (inOut == '+' && scale <= 1.0393117383747408) {
+                this.panner.smoothZoom(x, y, 1.4);
             }
-            if (inOut == '-') {
-
-                this.panner.smoothZoom(x, y, 0.8);
+            if (inOut == '-' && scale >= 0.23659892565807147) {
+                this.panner.smoothZoom(x, y, 0.6);
             }
         },
         popUp(location) {
@@ -198,8 +205,8 @@ export default {
     },
     async created() {
 
+        window.addEventListener("resize", this.resizeMap);
         //  alert(this.screenWidth)
-
         let page = await axios.get("https://linmere.greenwich-design-projects.co.uk/wp-json/wp/v2/pages")
         let data = await page.data.find(page => page.slug == 'kiosk').acf
         // // houses
@@ -423,7 +430,6 @@ export default {
 .mapBackground {
     height: 1080px;
     width: 1920px;
-
     background-size: cover;
     background-repeat: no-repeat;
     cursor: grab;
@@ -485,7 +491,7 @@ export default {
     font-size: 11px !important;
 }
 
-@media (min-width: 1920px) {
+@media (min-width: 800px) {
     .map__footer {
         background-color: #00745F;
         height: 168px;
@@ -515,7 +521,7 @@ export default {
     }
 }
 
-@media (max-width: 1920px) {
+@media (max-width: 800px) {
     .inactiveIcon * {
         fill: #00745F;
         color: #00745F;
@@ -605,6 +611,30 @@ button {
     color: #2c2e2c;
     font-size: 26px;
     margin-top: 13px;
+}
+
+.infoWindowSmall {
+    width: calc(100%-1em);
+    position: absolute;
+    bottom: 100px;
+    box-shadow: 0 1px 1px 0 rgba(187, 185, 185, 0.50);
+    min-height: 111px;
+    left: 1em;
+    right: 1em;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+}
+
+.infoWindowSmall__inner {
+    padding: 1em;
+
+    display: inline-block;
+}
+
+.infoWindowSmall__inner p {
+    line-height: 1 !important;
 }
 
 .infoWindow {
@@ -729,6 +759,24 @@ button {
 .infoWindow__inner {
     padding: 0 20px 10px 20px;
     color: #005A44;
+}
+
+@media (max-width: 800px) {
+
+    .infoWindow {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        top: unset;
+        min-height: 400px;
+        background-color: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 3px 2px;
+        transform: translateX(0);
+    }
+
 }
 
 .map__title {
