@@ -19,11 +19,11 @@
         </fade-transition>
     </div>
 
-    <panZoom @init="onInit" :options="{   zoomDoubleClickSpeed: 1,  touchUp: onTouchHandler,  smoothScroll: false, selector: '#mapBackground', onDoubleClick: onDoubleClickHandler, beforeWheel: beforeWheelHandler, autocenter: screenWidth >= 1920 ? false : true, bounds: true, initialY: screenWidth >= 1920 ? 0 : null, initialX: screenWidth >= 1920 ? -3 : null, initialZoom: screenWidth >= 1920 ? 1 : null}">
+    <panZoom @init="onInit" :options="{zoomDoubleClickSpeed: 1, smoothScroll: false, selector: '#mapBackground', onDoubleClick: onDoubleClickHandler, beforeWheel: beforeWheelHandler, autocenter: screenWidth >= 1920 ? false : true, bounds: true, initialY: screenWidth >= 1920 ? 0 : null, initialX: screenWidth >= 1920 ? -3 : null, initialZoom: screenWidth >= 1920 ? 1 : null}">
         <div class="mapBackground" id="mapBackground" :style="[{'background-image': 'url(' + require('./assets/map.jpg') + ')'}]">
             <transitionGroup name="bounce" mode="inOut">
-                <template v-for="(cat) in categorys">
-                    <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker " :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
+                <template v-for="(cat) in categorys" style="border: 1px red dashed">
+                    <div :data-category="cat.title" :data-location="location.title" v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}">
                         <div class="locations__marker__icon clickMe" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
                         <h4 class="locations__marker__title clickMe">{{location.title}}</h4>
                     </div>
@@ -118,18 +118,8 @@ Vue.use(VueScreenSize)
 export default {
     name: 'App',
     methods: {
-
-        onTouchHandler: function (e) {
-            // `e` - is current touch event.
-            // console.log('got')
-
-            return false; // tells the library to not preventDefault.
-        },
-
         onDoubleClickHandler(e) {
-
             //alert('here')
-
             // `e` - is current double click event.
             return false // tells the library to not preventDefault, and not stop propagation
         },
@@ -166,31 +156,31 @@ export default {
             this.panner.on('panstart', function (e) {
                 document.getElementById("mapBackground").style.cursor = "grabbing"
             });
+
             this.panner.on('panend', (e) => {
-                // console.log(panzoomInstance.getTransform())
+  
                 document.getElementById("mapBackground").style.cursor = "grab"
-                //     this.deactivatePan()
+             //   this.deactivatePan()
 
             });
 
-            const areas = document.querySelectorAll('.locations__marker'); // You could replace area with `a` if you want to trigger things on links
-            let touchStart = { x: 0, y: 0 };
-            for (let i = 0; i < areas.length; i++) {
-                const area = areas[i];
-                area.addEventListener('touchstart', (evt) => {
-                    touchStart = { x: evt.touches[0].screenX, y: evt.touches[0].screenY }; // Saves the touchstart position
-                });
-                area.addEventListener('touchend', (evt) => {
-                    if (touchStart !== undefined) {
-                        const touchEnd = { x: evt.changedTouches[0].screenX, y: evt.changedTouches[0].screenY }; // Saves the touchend position
-                        const distance = Math.sqrt(Math.pow(touchEnd.x - touchStart.x, 2) + Math.pow(touchEnd.y - touchStart.y, 2)); // pythagorean theorem to find the distance between start and end
-                        if (distance < 10) { // Configure the tolerance here
-                            area.click(); // Trigger the click event on the area that was tapped.
-                        }
-                    }
-                });
-            }
+            setTimeout(() => {
+                const boxes = document.querySelectorAll('.locations__marker');
+                let x = this
+                boxes.forEach(box => {
+                    box.addEventListener('click', function handleClick(event) {
+                        console.log('click received')
+                        x.popUp(event.target.closest("[data-location]").dataset.category, event.target.closest("[data-location]").dataset.location)
 
+                    });
+
+                    box.addEventListener('touchstart', function handleClick(event) {
+                        console.log('touch received')
+                        x.popUp(event.target.closest("[data-location]").dataset.category, event.target.closest("[data-location]").dataset.location)
+
+                    });
+                });
+            }, 2000);
         },
         zoomInOut(inOut) {
             let scale = this.panner.getTransform().scale
@@ -204,8 +194,20 @@ export default {
                 this.panner.smoothZoom(x, y, 0.6);
             }
         },
-        popUp(location) {
-            location ? this.location_selected = location : this.location_selected = []
+        popUp(cat, location) {
+
+            if (cat && location) {
+                let locations = this.categorys.find(x => x.title == cat).locations
+                let data = locations.find(y => y.title == location)
+
+                console.log(data)
+
+                this.location_selected = data
+            } else {
+
+                this.location_selected = []
+            }
+
         },
         selectTab(key) {
             this.closeAllTabs()
@@ -249,17 +251,7 @@ export default {
 
     async created() {
 
-        // @click won't work inside panzoom
-        // listen for clicks instead
 
-        // window.addEventListener("resize", this.resizeMap);
-
-        // setTimeout(() => {
-        //     let mapWindowH = document.getElementById('vue-frontend-app').offsetHeight
-        //     let footerH = document.getElementById('map__footer').offsetHeight
-        //     let map =  document.getElementById('mapBackground')
-        //     map.style.height = mapWindowH + 'px'
-        // }, 2000);
 
         //  alert(this.screenWidth)
         let page = await axios.get("https://linmere.greenwich-design-projects.co.uk/wp-json/wp/v2/pages")
