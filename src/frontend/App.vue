@@ -20,7 +20,7 @@
     </div>
 
     <panZoom @init="onInit" :options="{zoomDoubleClickSpeed: 1, smoothScroll: false, selector: '#mapBackground', onDoubleClick: onDoubleClickHandler, beforeWheel: beforeWheelHandler, autocenter: screenWidth >= 1920 ? false : true, bounds: true, initialY: screenWidth >= 1920 ? 0 : null, initialX: screenWidth >= 1920 ? -3 : null, initialZoom: screenWidth >= 1920 ? 1 : null}">
-        <div class="mapBackground" id="mapBackground" :style="[{'background-image': 'url(' + require('./assets/map.jpg') + ')'}]">
+        <div class="mapBackground" id="mapBackground" :style="[{'background-image': 'url(' + backgroundImage + ')'}]">
             <transitionGroup name="bounce" mode="inOut">
                 <template v-for="(cat) in categorys" style="border: 1px red dashed">
                     <div :data-category="cat.title" :data-location="location.title" v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}">
@@ -158,9 +158,9 @@ export default {
             });
 
             this.panner.on('panend', (e) => {
-  
+
                 document.getElementById("mapBackground").style.cursor = "grab"
-             //   this.deactivatePan()
+                //   this.deactivatePan()
 
             });
 
@@ -199,12 +199,8 @@ export default {
             if (cat && location) {
                 let locations = this.categorys.find(x => x.title == cat).locations
                 let data = locations.find(y => y.title == location)
-
-                console.log(data)
-
                 this.location_selected = data
             } else {
-
                 this.location_selected = []
             }
 
@@ -251,11 +247,10 @@ export default {
 
     async created() {
 
-
-
         //  alert(this.screenWidth)
         let page = await axios.get("https://linmere.greenwich-design-projects.co.uk/wp-json/wp/v2/pages")
         let data = await page.data.find(page => page.slug == 'kiosk').acf
+        this.backgroundImage = data.background_map_image
         // // houses
         // if (data['houses'])
         //     data['houses'].forEach((house) => {
@@ -315,6 +310,7 @@ export default {
     data: function () {
         return {
             zoom: 1,
+            backgroundImage: '',
             transform: null,
             panner: null,
             windowWidth: 0,
