@@ -18,13 +18,14 @@
             </span>
         </fade-transition>
     </div>
-    <panZoom @init="onInit" :options="{autocenter: screenWidth >= 1920 ? false : true, bounds: true, initialY: screenWidth >= 1920 ? 0 : null, initialX: screenWidth >= 1920 ? -3 : null, initialZoom: screenWidth >= 1920 ? 1 : null}">
+
+    <panZoom @init="onInit" :options="{   zoomDoubleClickSpeed: 1,  touchUp: onTouchHandler,  smoothScroll: false, selector: '#mapBackground', onDoubleClick: onDoubleClickHandler, beforeWheel: beforeWheelHandler, autocenter: screenWidth >= 1920 ? false : true, bounds: true, initialY: screenWidth >= 1920 ? 0 : null, initialX: screenWidth >= 1920 ? -3 : null, initialZoom: screenWidth >= 1920 ? 1 : null}">
         <div class="mapBackground" id="mapBackground" :style="[{'background-image': 'url(' + require('./assets/map.jpg') + ')'}]">
             <transitionGroup name="bounce" mode="inOut">
                 <template v-for="(cat) in categorys">
-                    <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker" :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
-                        <div class="locations__marker__icon" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
-                        <h4 class="locations__marker__title">{{location.title}}</h4>
+                    <div v-show="!category_selected || category_selected == cat" v-for="(location) in cat.locations" :key="location.title" class="locations__marker " :style="{top:location.y+'px', left:+location.x+'px'}" @click="popUp(location)">
+                        <div class="locations__marker__icon clickMe" :style="{backgroundColor:cat.iconColor}" v-html="cat.icon"></div>
+                        <h4 class="locations__marker__title clickMe">{{location.title}}</h4>
                     </div>
                 </template>
             </transitionGroup>
@@ -117,9 +118,30 @@ Vue.use(VueScreenSize)
 export default {
     name: 'App',
     methods: {
+
+        onTouchHandler: function (e) {
+            // `e` - is current touch event.
+            // console.log('got')
+
+            return false; // tells the library to not preventDefault.
+        },
+
+        onDoubleClickHandler(e) {
+
+            //alert('here')
+
+            // `e` - is current double click event.
+            return false // tells the library to not preventDefault, and not stop propagation
+        },
+        beforeWheelHandler(e) {
+            if (this.screenWidth < 768) {
+                var shouldIgnore = !e.altKey;
+                return shouldIgnore;
+            }
+        },
         resizeMap() {
             if (this.screenWidth < 800) {
-                this.panner.smoothMoveTo(this.panner.getTransform().x, 160)
+                this.panner.smoothMoveTo(this.panner.getTransform().x, 50)
             } else {
                 this.panner.smoothMoveTo(this.panner.getTransform().x, 0)
             }
@@ -140,16 +162,34 @@ export default {
             this.panner.setZoomSpeed(0.01)
             this.resizeMap()
             this.deactivatePan()
-            console.log(this.panner)
+
             this.panner.on('panstart', function (e) {
                 document.getElementById("mapBackground").style.cursor = "grabbing"
             });
-            this.panner.on('panend', function (e) {
-                console.log(panzoomInstance.getTransform())
+            this.panner.on('panend', (e) => {
+                // console.log(panzoomInstance.getTransform())
                 document.getElementById("mapBackground").style.cursor = "grab"
+                //     this.deactivatePan()
+
             });
 
-            let el = document.getElementById('vue-frontend-app');
+            const areas = document.querySelectorAll('.locations__marker'); // You could replace area with `a` if you want to trigger things on links
+            let touchStart = { x: 0, y: 0 };
+            for (let i = 0; i < areas.length; i++) {
+                const area = areas[i];
+                area.addEventListener('touchstart', (evt) => {
+                    touchStart = { x: evt.touches[0].screenX, y: evt.touches[0].screenY }; // Saves the touchstart position
+                });
+                area.addEventListener('touchend', (evt) => {
+                    if (touchStart !== undefined) {
+                        const touchEnd = { x: evt.changedTouches[0].screenX, y: evt.changedTouches[0].screenY }; // Saves the touchend position
+                        const distance = Math.sqrt(Math.pow(touchEnd.x - touchStart.x, 2) + Math.pow(touchEnd.y - touchStart.y, 2)); // pythagorean theorem to find the distance between start and end
+                        if (distance < 10) { // Configure the tolerance here
+                            area.click(); // Trigger the click event on the area that was tapped.
+                        }
+                    }
+                });
+            }
 
         },
         zoomInOut(inOut) {
@@ -208,7 +248,11 @@ export default {
     },
 
     async created() {
-        window.addEventListener("resize", this.resizeMap);
+
+        // @click won't work inside panzoom
+        // listen for clicks instead
+
+        // window.addEventListener("resize", this.resizeMap);
 
         // setTimeout(() => {
         //     let mapWindowH = document.getElementById('vue-frontend-app').offsetHeight
@@ -418,7 +462,6 @@ export default {
 
 .map {
     width: 100%;
-    height: 640px;
     background: rgb(255, 255, 255);
     background: -moz-linear-gradient(0deg, rgba(255, 255, 255, 1) 54%, rgba(227, 237, 249, 1) 100%);
     background: -webkit-linear-gradient(0deg, rgba(255, 255, 255, 1) 54%, rgba(227, 237, 249, 1) 100%);
@@ -426,6 +469,13 @@ export default {
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffffff", endColorstr="#e3edf9", GradientType=1);
     position: relative;
     overflow: hidden;
+    height: 400px;
+}
+
+@media (min-width: 768px) {
+    .map {
+        height: 600px;
+    }
 }
 
 @media (min-width: 1920px) {

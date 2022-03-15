@@ -384,6 +384,50 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* // Small devices (landscape phones, 576px and up) */
 @media (min-width: 576px) {}
 
@@ -413,7 +457,6 @@
 }
 .map {
     width: 100%;
-    height: 640px;
     background: rgb(255, 255, 255);
     background: -moz-linear-gradient(0deg, rgba(255, 255, 255, 1) 54%, rgba(227, 237, 249, 1) 100%);
     background: -webkit-linear-gradient(0deg, rgba(255, 255, 255, 1) 54%, rgba(227, 237, 249, 1) 100%);
@@ -421,6 +464,12 @@
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffffff", endColorstr="#e3edf9", GradientType=1);
     position: relative;
     overflow: hidden;
+    height: 400px;
+}
+@media (min-width: 768px) {
+.map {
+        height: 600px;
+}
 }
 @media (min-width: 1920px) {
 .map {
